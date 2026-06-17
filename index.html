@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestão de Contratos — DPE/RN · CFCC</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#00643C">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Contratos CFCC">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--verde:#00643C;--verde2:#14A064;--azulc:#78C8DC;--azul:#00648C;--bg:#f4f6f4;--card:#fff;--ink:#15201b;--muted:#5d6b62;--line:#e0e6e1;--ok:#14A064;--warn:#c9870a;--danger:#b3261e;--info:#00648C;--shadow:0 1px 2px rgba(0,40,20,.06),0 4px 16px rgba(0,40,20,.05);}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Georgia,'Times New Roman',serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.5}
+.sans{font-family:'Segoe UI',system-ui,-apple-system,sans-serif}
+button,input,select,textarea{font-family:'Segoe UI',system-ui,sans-serif;font-size:14px}
+header.top{background:var(--verde);color:#fff}
+.top-inner{max-width:1320px;margin:0 auto;padding:16px 24px;display:flex;align-items:center;gap:18px}
+.brand h1{font-size:19px;letter-spacing:.2px}
+.brand .sub{font-family:'Segoe UI',sans-serif;font-size:11.5px;opacity:.85;letter-spacing:.4px;text-transform:uppercase;margin-top:2px}
+.top-actions{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.snapshot-banner{background:var(--warn);color:#fff;text-align:center;padding:7px;font-family:'Segoe UI',sans-serif;font-size:13px;font-weight:600}
+nav.tabs{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30}
+.tabs-inner{max-width:1320px;margin:0 auto;display:flex;gap:2px;padding:0 16px;flex-wrap:wrap}
+.tab{font-family:'Segoe UI',sans-serif;font-size:13.5px;font-weight:600;color:var(--muted);background:none;border:none;padding:14px 14px;cursor:pointer;border-bottom:3px solid transparent}
+.tab:hover{color:var(--verde)}.tab.active{color:var(--verde);border-bottom-color:var(--verde2)}
+main{max-width:1320px;margin:0 auto;padding:24px}
+.btn{font-family:'Segoe UI',sans-serif;font-weight:600;font-size:13px;border:1px solid transparent;border-radius:7px;padding:8px 14px;cursor:pointer;transition:.12s}
+.btn-pri{background:var(--verde2);color:#fff}.btn-pri:hover{background:var(--verde)}
+.btn-gho{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.25)}.btn-gho:hover{background:rgba(255,255,255,.22)}
+.btn-out{background:#fff;color:var(--verde);border-color:var(--line)}.btn-out:hover{border-color:var(--verde2)}
+.btn-sm{padding:5px 10px;font-size:12px}
+.btn-danger{background:#fff;color:var(--danger);border-color:#f0c9c6}.btn-danger:hover{background:#fdf3f2}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-bottom:22px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--verde2)}
+.kpi.azul::before{background:var(--azul)}.kpi.ciano::before{background:var(--azulc)}.kpi.warn::before{background:var(--warn)}
+.kpi .lab{font-family:'Segoe UI',sans-serif;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:600}
+.kpi .val{font-size:26px;font-weight:700;margin-top:6px;color:var(--ink)}
+.kpi .note{font-family:'Segoe UI',sans-serif;font-size:11.5px;color:var(--muted);margin-top:4px}
+.grid2{display:grid;grid-template-columns:1.4fr 1fr;gap:18px}
+@media(max-width:900px){.grid2{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;box-shadow:var(--shadow);margin-bottom:18px}
+.panel h2{font-size:16px;margin-bottom:4px;color:var(--verde)}
+.panel .desc{font-family:'Segoe UI',sans-serif;font-size:12.5px;color:var(--muted);margin-bottom:16px}
+.bucket-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.bucket{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px;cursor:pointer;transition:.12s;border-left:4px solid var(--muted);text-align:left;font-family:'Segoe UI',sans-serif}
+.bucket:hover{box-shadow:var(--shadow);transform:translateY(-2px);border-color:var(--verde2)}
+.bucket .bn{font-size:25px;font-weight:700;color:var(--ink)}.bucket .bl{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:2px}
+.bucket.danger{border-left-color:var(--danger)}.bucket.warn{border-left-color:var(--warn)}.bucket.info{border-left-color:var(--info)}.bucket.ok{border-left-color:var(--verde2)}.bucket.neu{border-left-color:var(--muted)}.bucket.empty0{opacity:.5}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;font-family:'Segoe UI',sans-serif;font-size:12.5px}
+.bar-row.clk{cursor:pointer;border-radius:6px;padding:2px 4px;margin-left:-4px}
+.bar-row.clk:hover{background:#f3f8f5}.bar-row.clk:hover .nm{color:var(--verde)}.bar-row.clk:hover .bar-fill{filter:brightness(1.08)}
+.bar-row .nm{width:175px;flex-shrink:0;color:var(--ink)}
+.bar-track{flex:1;background:#eef2ef;border-radius:5px;height:22px;position:relative;overflow:hidden}
+.bar-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--verde2),var(--verde))}
+.bar-row .vl{width:130px;text-align:right;flex-shrink:0;font-variant-numeric:tabular-nums;color:var(--muted)}
+.row-click{display:flex;justify-content:space-between;align-items:center;padding:8px 6px;border-bottom:1px solid var(--line);font-family:'Segoe UI',sans-serif;font-size:13px;cursor:pointer;border-radius:6px}
+.row-click:hover{background:#f3f8f5;color:var(--verde)}
+table{width:100%;border-collapse:collapse;font-family:'Segoe UI',sans-serif;font-size:13px}
+th{text-align:left;padding:10px;border-bottom:2px solid var(--line);color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px;cursor:pointer;white-space:nowrap}
+th:hover{color:var(--verde)}
+td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
+tr.clickable:hover{background:#f7faf8;cursor:pointer}
+.pill{display:inline-block;font-family:'Segoe UI',sans-serif;font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.pill.ok{background:#e6f5ee;color:#0b6e44}.pill.warn{background:#fcf3e0;color:#9a6608}.pill.danger{background:#fbeae8;color:#9a2018}.pill.info{background:#e4f1f6;color:#0a5675}.pill.neu{background:#eef0ee;color:#5d6b62}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+input[type=text],input[type=number],input[type=date],select,textarea{border:1px solid var(--line);border-radius:7px;padding:8px 10px;background:#fff;color:var(--ink)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--verde2)}
+.search{flex:1;min-width:200px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.chip{display:inline-flex;align-items:center;gap:7px;background:#e6f5ee;color:#0b6e44;font-family:'Segoe UI',sans-serif;font-size:12px;font-weight:600;padding:5px 6px 5px 11px;border-radius:20px}
+.chip button{background:none;border:none;color:inherit;cursor:pointer;font-size:15px;line-height:1;padding:0 2px}.chip button:hover{color:var(--danger)}
+.modal-bg{position:fixed;inset:0;background:rgba(10,25,18,.45);display:flex;align-items:flex-start;justify-content:center;padding:30px 16px;z-index:100;overflow:auto}
+.modal{background:#fff;border-radius:14px;max-width:860px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal-head{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;position:sticky;top:0;background:#fff;border-radius:14px 14px 0 0;z-index:2}
+.modal-head h3{font-size:17px;color:var(--verde)}
+.modal-body{padding:22px}
+.modal-foot{padding:16px 22px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end;background:#fafbfa;border-radius:0 0 14px 14px;position:sticky;bottom:0}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:640px){.fgrid{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:5px}.field.full{grid-column:1/-1}
+.field label{font-family:'Segoe UI',sans-serif;font-size:11.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+.section-t{font-family:'Segoe UI',sans-serif;font-size:13px;font-weight:700;color:var(--verde);margin:22px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.alert{font-family:'Segoe UI',sans-serif;font-size:12.5px;padding:11px 14px;border-radius:8px;margin-bottom:12px;display:flex;gap:9px;align-items:flex-start}
+.alert.w{background:#fcf6e8;color:#7a5a07;border:1px solid #f0e0b8}.alert.d{background:#fbeeec;color:#7a1c15;border:1px solid #f0cdc8}.alert.i{background:#e8f2f6;color:#0a4f6b;border:1px solid #c7e2ec}
+.limit-card{border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:14px;box-shadow:var(--shadow);background:#fff}
+.limit-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}
+.gauge{display:flex;gap:18px;flex-wrap:wrap}.gauge-item{flex:1;min-width:200px}
+.gauge-lab{font-family:'Segoe UI',sans-serif;font-size:11.5px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.3px;margin-bottom:5px}
+.gauge-track{background:#eef2ef;border-radius:6px;height:26px;overflow:hidden}.gauge-fill{height:100%;border-radius:6px;transition:width .3s}
+.gauge-num{font-family:'Segoe UI',sans-serif;font-size:12px;font-weight:700;margin-top:4px}
+.mini-tbl td,.mini-tbl th{padding:6px 8px;font-size:12px}
+.mini-tbl input,.mini-tbl select{padding:4px 5px;font-size:11px;width:100%;min-width:60px}
+.add-row-btn{margin-top:8px}
+.empty{text-align:center;padding:50px 20px;color:var(--muted);font-family:'Segoe UI',sans-serif}
+.tag-cat{font-family:'Segoe UI',sans-serif;font-size:10.5px;font-weight:700;color:var(--azul);text-transform:uppercase;letter-spacing:.3px}
+.x{margin-left:auto;background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1}.x:hover{color:var(--danger)}
+.foot{text-align:center;font-family:'Segoe UI',sans-serif;font-size:11.5px;color:var(--muted);padding:30px 16px 50px}
+.dq{font-family:'Segoe UI',sans-serif;font-size:11px;color:var(--warn);font-weight:600}
+.readonly-hide{display:initial}body.readonly .readonly-hide{display:none!important}
+.legal-note{font-family:'Segoe UI',sans-serif;font-size:11.5px;color:var(--muted);background:#f7faf8;border-left:3px solid var(--azulc);padding:10px 12px;border-radius:0 6px 6px 0;margin-top:10px;line-height:1.55}
+.badge{display:inline-block;font-family:'Segoe UI',sans-serif;font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;background:#eef2ef;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+.badge.ad{background:#e4f1f6;color:#0a5675}.badge.ap{background:#f1ecf6;color:#5b3a86}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-inner">
+  <div class="brand"><h1>Gestão e Acompanhamento de Contratos</h1><div class="sub">DPE/RN · Coordenadoria de Fiscalização de Contratos e Convênios — CFCC</div></div>
+  <div class="top-actions">
+    <span id="syncStatus" class="pill neu readonly-hide" style="font-size:11px;cursor:pointer" onclick="Sync.toggleMenu()" title="Compartilhamento">◌ Local</span>
+    <span id="presence" class="sans readonly-hide" style="font-size:11px;opacity:.85"></span>
+    <span id="modeBadge" class="pill info" style="font-size:11px"></span>
+    <button class="btn btn-gho readonly-hide" onclick="exportReadonly()">Exportar visualização</button>
+    <button class="btn btn-gho readonly-hide" onclick="exportJSON()">Backup (JSON)</button>
+    <button class="btn btn-gho readonly-hide" onclick="document.getElementById('imp').click()">Restaurar</button>
+    <input type="file" id="imp" accept="application/json" style="display:none" onchange="importJSON(event)">
+  </div>
+</div></header>
+<div id="snapBanner" class="snapshot-banner" style="display:none"></div>
+<nav class="tabs"><div class="tabs-inner" id="tabbar"></div></nav>
+<main id="view"></main>
+<div class="foot">Elaboração técnica: Rony Salles — Coordenador CFCC · DPE/RN &nbsp;|&nbsp; fiscalizacao@dpern.def.br · (84) 98101-5804<br>Ferramenta interna de coordenação · uso restrito à capacitação e gestão da CFCC · © <span id="yr"></span></div>
+<div id="modalRoot"></div>
+
+<script>
+/* ============ SEED (planilhas reais) ============ */
+const SEED = [];
+const SNAPSHOT = null;
+/* ================================================ */
+const MODE = SNAPSHOT ? 'readonly' : 'edit';
+const STORE_KEY = 'cfcc_contratos_v2';
+const CATEGORIAS = ['TERCEIRIZADAS','SERVIÇOS ESSENCIAIS','LOCAÇÃO IMÓVEIS','MANUTENÇÃO','SERVIÇOS GERAIS','SOFTWARES E SISTEMAS','ARPs','AQUISIÇÕES'];
+const REGIMES = ['Lei 14.133/2021','Lei 8.666/1993','Lei 10.520/2002 (Pregão)','Lei 8.987/1995 (Concessão)','Outro / N/I'];
+const SITUACOES = ['VIGENTE','A VENCER','VENCIDO','RENEGOCIAR','SUSPENSO','CONCLUÍDO'];
+const SITUACOES_ADMIN = ['VIGENTE','RENEGOCIAR','SUSPENSO','Finalizado'];
+const REP_STATUS = ['EM TRÂMITE','PENDENTE','CONCLUÍDA','NÃO HÁ PEDIDO'];
+const VENC_BUCKETS=[['vencido','Vencidos',d=>d!=null&&d<0,'danger'],['d30','Vencem em ≤ 30 dias',d=>d!=null&&d>=0&&d<=30,'danger'],['d60','Vencem em 31–60 dias',d=>d!=null&&d>30&&d<=60,'warn'],['d90','Vencem em 61–90 dias',d=>d!=null&&d>60&&d<=90,'warn'],['d180','Vencem em 91–180 dias',d=>d!=null&&d>90&&d<=180,'info'],['d180p','Vencem em > 180 dias',d=>d!=null&&d>180,'ok'],['indet','Sem data / indeterminado',d=>d==null,'neu'],['concluido','Concluídos',null,'neu']];
+const VENC_LABEL=Object.fromEntries(VENC_BUCKETS.map(b=>[b[0],b[1]]));
+
+let DB = load();
+let state = {tab:'dash',sortKey:'vigenciaFim',sortDir:1,filtroCats:[],filtroSits:[],filtroFiscais:[],filtroVencs:[],busca:'',histKind:'',histBusca:'',repStatus:[]};
+
+const SCHEMA = 2;
+function migrate(c){
+  // normaliza schema antigo -> novo sem perda; versionamento implícito por presença de campos
+  if(c.tipoValor==='recorrente') c.tipoValor='continuo';
+  c.aditivos=c.aditivos||[]; c.apostilamentos=c.apostilamentos||[];
+  if(c.repactuacao===undefined) c.repactuacao=null;
+  if(c.obraReforma===undefined) c.obraReforma=false;
+  if(c.regime===undefined) c.regime=null;
+  if(c.valorInicialAtualizado===undefined) c.valorInicialAtualizado=null;
+  c.aditivos.forEach(a=>{ if(a.objeto===undefined)a.objeto=''; });
+  c.apostilamentos.forEach(a=>{ if(a.objeto===undefined)a.objeto=''; });
+  if(c._v===undefined) c._v=1;
+  if(!c.id) c.id='C'+Math.random().toString(36).slice(2,8);
+  return c;
+}
+function SIT_WORDS(){return ['a vencer','vencido','vigente','renegociar','suspenso','finalizado','concluído','concluido'];}
+function isPhantom(c){return SIT_WORDS().includes((c.fiscalTitular||'').trim().toLowerCase());}
+function loadTomb(){try{return JSON.parse(localStorage.getItem('cfcc_tomb')||'[]');}catch(e){return [];}}
+function saveTomb(t){try{localStorage.setItem('cfcc_tomb',JSON.stringify(t));}catch(e){}}
+function normalizeAll(arr){
+  const tomb=new Set(loadTomb().map(t=>t.id));
+  return (arr||[]).map(migrate).filter(c=>!isPhantom(c)&&!tomb.has(c.id));
+}
+function dupKeys(){
+  // contrato+fornecedor que aparecem 2+ vezes (para sinalizar possível duplicidade)
+  const cnt={};DB.forEach(c=>{const n=(c.contrato||'').toString().replace(/\s+/g,'').toLowerCase().replace(/^0+/,'');const f=(c.fornecedor||'').trim().toLowerCase().slice(0,18);if(n&&f){const k=n+'|'+f;cnt[k]=(cnt[k]||0)+1;}});
+  return new Set(Object.keys(cnt).filter(k=>cnt[k]>1));
+}
+function dupKeyOf(c){const n=(c.contrato||'').toString().replace(/\s+/g,'').toLowerCase().replace(/^0+/,'');const f=(c.fornecedor||'').trim().toLowerCase().slice(0,18);return n&&f?n+'|'+f:null;}
+function load(){ if(MODE==='readonly') return normalizeAll(structuredClone(SEED)); try{const s=localStorage.getItem(STORE_KEY);if(s)return normalizeAll(JSON.parse(s));}catch(e){} return normalizeAll(structuredClone(SEED)); }
+function save(opts){ if(MODE!=='edit')return; try{localStorage.setItem(STORE_KEY,JSON.stringify(DB));}catch(e){alert('Falha ao salvar: '+e.message);} Snapshots.maybe(); if(window.Sync&&Sync.connected&&!(opts&&opts.fromSync)) Sync.pushSoon(); }
+
+const BRL=v=>v==null||isNaN(v)?'—':v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const fmtDate=d=>{if(!d)return'—';if(d==='INDETERMINADO')return'Indeterminado';const[y,m,dd]=d.split('-');return dd?`${dd}/${m}/${y}`:d;};
+function diasAVencer(fim){if(!fim||fim==='INDETERMINADO')return null;const t=new Date();t.setHours(0,0,0,0);const f=new Date(fim+'T00:00:00');return Math.round((f-t)/86400000);}
+function esc(s){return(s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function uid(){return'C'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
+function valorRef(c){return c.tipoValor==='continuo'?(c.valorMensal||0):c.tipoValor==='demanda'?(c.valorTotal!=null?c.valorTotal:(c.valorMensal||0)):(c.valorTotal||0);}
+function ativo(c){const s=situacaoEfetiva(c);return s!=='CONCLUÍDO'&&s!=='VENCIDO';}
+function bucketOf(c){const s=(c.situacao||'').toLowerCase();if(s==='finalizado'||s==='concluido'||s==='concluído')return'concluido';const d=diasAVencer(c.vigenciaFim);if(c.tipoValor==='unico'&&((d!=null&&d<0)||s==='vencido'))return'concluido';for(const[k,,fn]of VENC_BUCKETS){if(fn&&fn(d))return k;}return'indet';}
+function rotuloTipo(t){return t==='continuo'?'contínuo':t==='demanda'?'por demanda':'único';}
+function situacaoEfetiva(c){const s=(c.situacao||'').toLowerCase();if(s==='finalizado'||s==='concluido'||s==='concluído')return'CONCLUÍDO';if(s==='suspenso')return'SUSPENSO';const d=diasAVencer(c.vigenciaFim);if(c.tipoValor==='unico'&&((d!=null&&d<0)||s==='vencido'))return'CONCLUÍDO';if(d!=null&&d<0)return'VENCIDO';if(s==='renegociar')return'RENEGOCIAR';if(d==null)return'VIGENTE';if(d<=90)return'A VENCER';return'VIGENTE';}
+function pillSit(s){return s==='VIGENTE'?'ok':s==='A VENCER'?'info':s==='VENCIDO'?'danger':s==='RENEGOCIAR'?'warn':'neu';}
+function pillRep(s){s=(s||'').toUpperCase();return s==='EM TRÂMITE'?'info':s==='PENDENTE'?'warn':s==='CONCLUÍDA'?'ok':'neu';}
+
+/* limite: só acréscimo/supressão consomem */
+function calcLimite(c){const base=c.valorInicialAtualizado!=null?c.valorInicialAtualizado:null;const ad=c.aditivos||[];const acr=ad.filter(a=>a.tipo==='acrescimo').reduce((s,a)=>s+(+a.valor||0),0);const sup=ad.filter(a=>a.tipo==='supressao').reduce((s,a)=>s+(+a.valor||0),0);const tetoAcr=c.obraReforma?0.50:0.25,tetoSup=0.25;return{base,acr,sup,tetoAcr,tetoSup,pctAcr:base?acr/base:null,pctSup:base?sup/base:null,dispAcr:base?base*tetoAcr-acr:null,dispSup:base?base*tetoSup-sup:null,excedeAcr:base?acr>base*tetoAcr+1e-6:false,excedeSup:base?sup>base*tetoSup+1e-6:false,pronto:base!=null&&c.regime!=null};}
+
+const TABS=[['dash','Painel Gerencial'],['contratos','Contratos'],['limite','Calculadora de Limite'],['prorrog','Prorrogações'],['repact','Repactuações'],['hist','Aditivos & Histórico'],['sobre','Sobre']];
+function renderTabs(){document.getElementById('tabbar').innerHTML=TABS.map(([k,l])=>`<button class="tab ${state.tab===k?'active':''}" onclick="go('${k}')">${l}</button>`).join('');}
+function go(t){state.tab=t;render();window.scrollTo(0,0);}
+function goFiltered(f){state.filtroCats=f.cat?[f.cat]:[];state.filtroSits=f.sit?[f.sit]:[];state.filtroFiscais=f.fiscal?[f.fiscal]:[];state.filtroVencs=f.venc?[f.venc]:[];state.busca='';state.tab='contratos';render();window.scrollTo(0,0);}
+function addFilter(field,v){if(v&&!state[field].includes(v))state[field].push(v);renderBody();}
+function removeFilter(field,v){state[field]=state[field].filter(x=>x!==v);renderBody();}
+function limparFiltros(){state.filtroCats=[];state.filtroSits=[];state.filtroVencs=[];state.filtroFiscais=[];renderBody();}
+
+/* ---------- DASHBOARD ---------- */
+function renderDash(){
+  const cs=DB;
+  const ativos=cs.filter(ativo);
+  const cont=ativos.filter(c=>c.tipoValor==='continuo'),dem=ativos.filter(c=>c.tipoValor==='demanda'),uni=ativos.filter(c=>c.tipoValor==='unico');
+  const mensalTot=cont.reduce((s,c)=>s+(c.valorMensal||0),0);
+  const demTot=dem.reduce((s,c)=>s+valorRef(c),0);
+  const unicoTot=uni.reduce((s,c)=>s+(c.valorTotal||0),0);
+  const totAtencao=cs.filter(c=>['d30','d60','d90'].includes(bucketOf(c))||situacaoEfetiva(c)==='VENCIDO').length;
+  const repAtivas=cs.filter(c=>c.repactuacao&&['EM TRÂMITE','PENDENTE'].includes((c.repactuacao.status||'').toUpperCase())).length;
+  const nConcl=cs.length-ativos.length;
+  let html='';
+  if(!DB.length && MODE!=='readonly'){ html+=`<div class="alert i" style="margin-bottom:16px"><div>&#8505; <b>Nenhum contrato carregado.</b> Esta versão (GitHub) abre sem dados embarcados. Clique em <b>&#8220;&#9676; Local&#8221;</b> no topo e conecte a <b>pasta do SharePoint</b> (sincronizada localmente) que contém o arquivo <code>contratos.json</code> para carregar a base.</div></div>`; }
+  html+=`<div class="kpis">
+    <div class="kpi"><div class="lab">Contratos ativos</div><div class="val">${ativos.length}</div><div class="note">${cont.length} contínuos · ${dem.length} por demanda · ${uni.length} únicos${nConcl?` · ${nConcl} concluídos/vencidos fora do cômputo`:''}</div></div>
+    <div class="kpi azul"><div class="lab">Despesa mensal fixa (contínuos)</div><div class="val" style="font-size:22px">${BRL(mensalTot)}</div><div class="note">pagamento mensal · anualizável: ${BRL(mensalTot*12)}/ano</div></div>
+    <div class="kpi ciano"><div class="lab">Contínuos por demanda (global)</div><div class="val" style="font-size:22px">${BRL(demTot)}</div><div class="note">manutenção/seguro/licença · valor registrado, rever base</div></div>
+    <div class="kpi warn"><div class="lab">Aquisição única (OC/ARP)</div><div class="val" style="font-size:22px">${BRL(unicoTot)}</div><div class="note">${totAtencao} em atenção de vigência · ${repAtivas} repactuação(ões)</div></div>
+  </div>`;
+  // faixas
+  const counts={};VENC_BUCKETS.forEach(b=>counts[b[0]]=0);cs.forEach(c=>counts[bucketOf(c)]++);
+  html+=`<div class="panel"><h2>Vigência por faixa de vencimento</h2><div class="desc">Clique numa faixa para abrir a lista filtrada. Concluídos e vencidos não entram nos valores totais acima.</div><div class="bucket-grid">`;
+  VENC_BUCKETS.forEach(([k,lab,,cls])=>{const n=counts[k];html+=`<button class="bucket ${cls} ${n===0?'empty0':''}" onclick="goFiltered({venc:'${k}'})"><div class="bn">${n}</div><div class="bl">${lab}</div></button>`;});
+  html+=`</div></div>`;
+  const reneg=cs.filter(c=>situacaoEfetiva(c)==='RENEGOCIAR').length;
+  if(reneg)html+=`<div class="alert i" style="cursor:pointer" onclick="goFiltered({sit:'RENEGOCIAR'})">↻ <div><b>${reneg} contrato(s) em renegociação.</b> Clique para abrir.</div></div>`;
+  // categorias (só contínuos fixos) + situação
+  const contCats=['TERCEIRIZADAS','SERVIÇOS ESSENCIAIS','LOCAÇÃO IMÓVEIS','SERVIÇOS GERAIS'];
+  const porCat=contCats.map(cat=>{const list=cont.filter(c=>c.categoria===cat);const co=list.reduce((s,c)=>s+(c.valorMensal||0),0);return{cat,qtd:list.length,co};}).filter(x=>x.qtd>0);
+  const maxRec=Math.max(1,...porCat.map(x=>x.co));
+  const sitMap={};cs.forEach(c=>{const s=situacaoEfetiva(c);sitMap[s]=(sitMap[s]||0)+1;});
+  html+=`<div class="grid2"><div class="panel"><h2>Despesa mensal fixa por categoria</h2><div class="desc">Apenas contínuos de pagamento mensal e ativos. Por demanda e únicos exibidos à parte.</div>`;
+  porCat.forEach(x=>{html+=`<div class="bar-row clk" onclick="goFiltered({cat:'${x.cat.replace(/'/g,"\\'")}'})"><div class="nm">${esc(x.cat)} <span style="color:var(--muted)">(${x.qtd})</span></div><div class="bar-track"><div class="bar-fill" style="width:${(x.co/maxRec*100).toFixed(1)}%"></div></div><div class="vl">${x.co?BRL(x.co):'—'}</div></div>`;});
+  html+=`</div><div class="panel"><h2>Distribuição por situação</h2><div class="desc">Situação efetiva, atualizada automaticamente pela vigência. Clique para filtrar.</div>`;
+  Object.entries(sitMap).sort((a,b)=>b[1]-a[1]).forEach(([s,n])=>{html+=`<div class="row-click" onclick="goFiltered({sit:'${s.replace(/'/g,"\\'")}'})"><span class="pill ${pillSit(s)}">${esc(s)}</span><b>${n}</b></div>`;});
+  html+=`</div></div>`;
+  // por demanda + único detalhados
+  html+=`<div class="grid2"><div class="panel"><h2>Contínuos por demanda (ativos)</h2><div class="desc">Manutenção, seguro, licenças: contínuos/renováveis, mas pagos por demanda — valor lido como global, não como mensalidade fixa. Clique para filtrar.</div>`;
+  const demByCat={};dem.forEach(c=>{demByCat[c.categoria]=(demByCat[c.categoria]||0)+valorRef(c);});
+  Object.entries(demByCat).sort((a,b)=>b[1]-a[1]).forEach(([cat,v])=>{html+=`<div class="row-click" onclick="goFiltered({cat:'${cat.replace(/'/g,"\\'")}'})"><span>${esc(cat)}</span><b>${BRL(v)}</b></div>`;});
+  html+=`</div><div class="panel"><h2>Aquisição única — OC/ARP (ativos)</h2><div class="desc">Pagamento único; encerram ao fim da vigência (não se renovam). Clique para filtrar.</div>`;
+  const uniByCat={};uni.forEach(c=>{uniByCat[c.categoria]=(uniByCat[c.categoria]||0)+(c.valorTotal||0);});
+  Object.entries(uniByCat).sort((a,b)=>b[1]-a[1]).forEach(([cat,v])=>{html+=`<div class="row-click" onclick="goFiltered({cat:'${cat.replace(/'/g,"\\'")}'})"><span>${esc(cat)}</span><b>${BRL(v)}</b></div>`;});
+  html+=`</div></div>`;
+  // repactuação mini-panel
+  const repMap={};cs.forEach(c=>{if(c.repactuacao){const s=(c.repactuacao.status||'N/I').toUpperCase();repMap[s]=(repMap[s]||0)+1;}});
+  if(Object.keys(repMap).length){html+=`<div class="panel"><h2>Repactuações por status</h2><div class="desc">Clique para abrir a aba de repactuações filtrada.</div>`;
+    Object.entries(repMap).sort((a,b)=>b[1]-a[1]).forEach(([s,n])=>{html+=`<div class="row-click" onclick="state.repStatus=['${s.replace(/'/g,"\\'")}'];go('repact')"><span class="pill ${pillRep(s)}">${esc(s)}</span><b>${n}</b></div>`;});
+    html+=`</div>`;}
+  // fiscal (só ativos)
+  const fmap={};cs.forEach(c=>{if(!ativo(c))return;const f=c.fiscalTitular||'(sem fiscal)';if(!fmap[f])fmap[f]={qtd:0,mensal:0,venc:0};fmap[f].qtd++;fmap[f].mensal+=(c.tipoValor==='continuo'?(c.valorMensal||0):0);if(['d30','d60','d90'].includes(bucketOf(c)))fmap[f].venc++;});
+  const fiscais=Object.entries(fmap).sort((a,b)=>b[1].qtd-a[1].qtd);
+  html+=`<div class="panel"><h2>Carteira por fiscal titular (contratos ativos)</h2><div class="desc">${fiscais.length} fiscais. Clique para abrir os contratos de cada um.</div><table><thead><tr><th>Fiscal titular</th><th>Contratos ativos</th><th>Despesa mensal fixa</th><th>A vencer ≤90d</th></tr></thead><tbody>`;
+  fiscais.forEach(([f,d])=>{html+=`<tr class="clickable" onclick="goFiltered({fiscal:'${f.replace(/'/g,"\\'")}'})"><td><b>${esc(f)}</b></td><td>${d.qtd}</td><td>${d.mensal?BRL(d.mensal):'—'}</td><td>${d.venc?`<span class="pill warn">${d.venc}</span>`:'<span class="pill neu">0</span>'}</td></tr>`;});
+  html+=`</tbody></table></div>`;
+  html+=`<div class="panel"><div class="legal-note"><b>Nota metodológica.</b> Três naturezas de valor, não somáveis num único número: <b>contínuo de pagamento mensal</b> (terceirização, locação) — valor mensal; <b>contínuo por demanda</b> (manutenção, seguro, licença) — contrato renovável, mas consumo/pagamento por demanda, valor lido como global; <b>aquisição única</b> (OC/ARP) — pagamento único que encerra ao fim da vigência. Contratos concluídos e vencidos não entram nos totais nem exibem contagem de dias.</div></div>`;
+  return html;
+}
+
+/* ---------- CONTRATOS ---------- */
+function filtered(){
+  let cs=DB.slice();
+  if(state.filtroCats.length)cs=cs.filter(c=>state.filtroCats.includes(c.categoria));
+  if(state.filtroSits.length)cs=cs.filter(c=>state.filtroSits.includes(situacaoEfetiva(c)));
+  if(state.filtroFiscais.length)cs=cs.filter(c=>state.filtroFiscais.includes(c.fiscalTitular||'(sem fiscal)'));
+  if(state.filtroVencs.length)cs=cs.filter(c=>state.filtroVencs.includes(bucketOf(c)));
+  if(state.busca){const q=state.busca.toLowerCase();cs=cs.filter(c=>[c.fornecedor,c.objeto,c.contrato,c.cnpj,c.fiscalTitular,c.sei].some(v=>(v||'').toLowerCase().includes(q)));}
+  const k=state.sortKey;
+  cs.sort((a,b)=>{let x=a[k],y=b[k];if(k==='valorRef'){x=valorRef(a);y=valorRef(b);}x=x==null?'':x;y=y==null?'':y;return(x>y?1:x<y?-1:0)*state.sortDir;});
+  return cs;
+}
+function fchips(field,prefix,labelFn){return state[field].map(v=>`<span class="chip">${esc(prefix+(labelFn?labelFn(v):v))}<button onclick="removeFilter('${field}',decodeURIComponent('${encodeURIComponent(v)}'))">×</button></span>`).join('');}
+function chips(){const all=fchips('filtroCats','Categoria: ')+fchips('filtroSits','Situação: ')+fchips('filtroVencs','Vencimento: ',v=>VENC_LABEL[v])+fchips('filtroFiscais','Fiscal: ');if(!all)return'';return`<div class="chips">${all}<button class="btn btn-out btn-sm" onclick="limparFiltros()">Limpar tudo</button></div>`;}
+function renderContratos(){
+  const cs=filtered();
+  const dups=dupKeys();
+  const fiscais=[...new Set(DB.map(c=>c.fiscalTitular||'(sem fiscal)'))].sort();
+  let html=`<div class="toolbar">
+    <input type="text" class="search" placeholder="Buscar fornecedor, objeto, nº, CNPJ, fiscal…" value="${esc(state.busca)}" oninput="state.busca=this.value;renderBody()">
+    <select onchange="addFilter('filtroCats',this.value);this.value=''"><option value="">+ Categoria…</option>${CATEGORIAS.filter(c=>!state.filtroCats.includes(c)).map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('')}</select>
+    <select onchange="addFilter('filtroSits',this.value);this.value=''"><option value="">+ Situação…</option>${SITUACOES.filter(s=>!state.filtroSits.includes(s)).map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join('')}</select>
+    <select onchange="addFilter('filtroVencs',this.value);this.value=''"><option value="">+ Vencimento…</option>${VENC_BUCKETS.filter(b=>!state.filtroVencs.includes(b[0])).map(b=>`<option value="${b[0]}">${esc(b[1])}</option>`).join('')}</select>
+    <select onchange="addFilter('filtroFiscais',this.value);this.value=''"><option value="">+ Fiscal…</option>${fiscais.filter(f=>!state.filtroFiscais.includes(f)).map(f=>`<option value="${esc(f)}">${esc(f)}</option>`).join('')}</select>
+    <button class="btn btn-pri readonly-hide" onclick="openEdit(null)">+ Novo contrato</button>
+  </div>${chips()}`;
+  html+=`<div class="panel" style="padding:6px 6px"><table><thead><tr>${th('contrato','Contrato')}${th('fornecedor','Fornecedor')}${th('categoria','Categoria')}${th('valorRef','Valor ref.')}${th('vigenciaFim','Vigência fim')}<th>Dias</th>${th('situacao','Situação')}<th>Alt.</th>${th('fiscalTitular','Fiscal tit.')}</tr></thead><tbody>`;
+  if(!cs.length)html+=`<tr><td colspan="9"><div class="empty">Nenhum contrato com os filtros atuais.</div></td></tr>`;
+  cs.forEach(c=>{
+    const d=diasAVencer(c.vigenciaFim);
+    const dpill=!ativo(c)?'<span class="pill neu">—</span>':d==null?'<span class="pill neu">—</span>':d<0?`<span class="pill danger">${d}</span>`:d<=90?`<span class="pill warn">${d}</span>`:`<span class="pill ok">${d}</span>`;
+    const sefe=situacaoEfetiva(c);
+    const dirty=(c.tipoValor==='continuo'&&c.valorMensal==null)||(c.tipoValor==='unico'&&c.valorTotal==null);
+    const nalt=(c.aditivos?.length||0)+(c.apostilamentos?.length||0);
+    const rep=c.repactuacao&&['EM TRÂMITE','PENDENTE'].includes((c.repactuacao.status||'').toUpperCase())?'<span class="badge" style="background:#fcf3e0;color:#9a6608" title="repactuação em andamento">REP</span>':'';
+    html+=`<tr class="clickable" onclick="openEdit('${c.id}')">
+      <td><b>${esc(c.contrato||'—')}</b>${dups.has(dupKeyOf(c))?' <span class="badge" style="background:#fcf3e0;color:#9a6608" title="Mesmo nº e fornecedor de outro registro — verifique duplicidade">DUP?</span>':''}<br><span class="tag-cat">${rotuloTipo(c.tipoValor)}</span></td>
+      <td>${esc(c.fornecedor||'—')}<br><span style="color:var(--muted);font-size:11.5px">${esc(c.objeto||'')}</span></td>
+      <td style="font-size:11.5px">${esc(c.categoria)}</td>
+      <td style="white-space:nowrap">${BRL(valorRef(c))}${dirty?'<br><span class="dq">⚠ revisar</span>':''}<br><span style="color:var(--muted);font-size:11px">${c.tipoValor==='continuo'?'/mês':'total'}</span></td>
+      <td style="white-space:nowrap">${fmtDate(c.vigenciaFim)}</td><td>${dpill}</td>
+      <td><span class="pill ${pillSit(sefe)}">${esc(sefe)}</span> ${rep}</td>
+      <td>${nalt?`<span class="badge">${nalt}</span>`:'—'}</td>
+      <td style="font-size:12px">${esc(c.fiscalTitular||'—')}</td></tr>`;
+  });
+  html+=`</tbody></table></div><div class="sans" style="font-size:12px;color:var(--muted);margin-top:8px">${cs.length} de ${DB.length} contratos.</div>`;
+  return html;
+}
+function th(k,l){const act=state.sortKey===k;return`<th onclick="sortBy('${k}')">${l}${act?(state.sortDir>0?' ▲':' ▼'):''}</th>`;}
+function sortBy(k){if(state.sortKey===k)state.sortDir*=-1;else{state.sortKey=k;state.sortDir=1;}renderBody();}
+
+/* ---------- LIMITE ---------- */
+function renderLimite(){
+  const cs=DB.filter(c=>c.tipoValor==='continuo'||(c.aditivos&&c.aditivos.length)||c.valorInicialAtualizado!=null);
+  const semBase=DB.filter(c=>c.valorInicialAtualizado==null);
+  let html=`<div class="panel"><h2>Calculadora de limites de alteração contratual</h2><div class="desc">Consumo dos limites de acréscimo e supressão (art. 125 da Lei 14.133/2021 / art. 65 da Lei 8.666/1993).</div><div class="legal-note"><b>Regras.</b> Teto de <b>25%</b> (acréscimos e supressões); <b>50%</b> só para acréscimo em reforma de edifício/equipamento. Acréscimo e supressão <b>isolados</b>. Apostilamentos e aditivos de prazo/qualitativos <b>não consomem</b>. Base = valor inicial atualizado, informado por contrato. <b>Os aditivos importados das planilhas não trazem o valor R$ de cada alteração</b> — informe os valores nos aditivos de acréscimo/supressão para o cálculo operar.</div></div>`;
+  if(semBase.length===DB.length)html+=`<div class="alert i">ℹ <div><b>Nenhum contrato tem "valor inicial atualizado" cadastrado.</b> Abra um contrato, informe valor inicial e regime, e lance os valores dos aditivos de acréscimo/supressão.</div></div>`;
+  const prontos=cs.filter(c=>calcLimite(c).pronto);
+  if(!prontos.length&&semBase.length<DB.length)html+=`<div class="empty">Informe valor inicial atualizado e regime nos contratos.</div>`;
+  prontos.forEach(c=>{const L=calcLimite(c);html+=`<div class="limit-card"><div class="limit-head"><div><b style="font-size:15px">${esc(c.contrato)}</b> — ${esc(c.fornecedor||'')}<br><span class="sans" style="font-size:12px;color:var(--muted)">${esc(c.objeto||'')} · ${esc(c.regime||'')} ${c.obraReforma?'· <b style="color:var(--azul)">obra/reforma (50%)</b>':''}</span></div><button class="btn btn-out btn-sm readonly-hide" onclick="openEdit('${c.id}')">Editar / aditivos</button></div><div class="sans" style="font-size:12.5px;color:var(--muted);margin-bottom:12px">Base: <b style="color:var(--ink)">${BRL(L.base)}</b></div><div class="gauge">${gauge('Acréscimos',L.pctAcr,L.tetoAcr,L.acr,L.dispAcr,L.excedeAcr)}${gauge('Supressões',L.pctSup,L.tetoSup,L.sup,L.dispSup,L.excedeSup)}</div></div>`;});
+  return html;
+}
+function gauge(lab,pct,teto,abs,disp,excede){const p=pct==null?0:pct,fill=Math.min(100,(p/teto)*100);const col=excede?'var(--danger)':p/teto>0.8?'var(--warn)':'var(--verde2)';return`<div class="gauge-item"><div class="gauge-lab">${lab} — teto ${(teto*100).toFixed(0)}%</div><div class="gauge-track"><div class="gauge-fill" style="width:${fill}%;background:${col}"></div></div><div class="gauge-num" style="color:${col}">${(p*100).toFixed(2)}% · ${BRL(abs)} ${excede?'· <b>EXCEDIDO</b>':`· disp. ${BRL(disp)}`}</div></div>`;}
+
+/* ---------- PRORROGAÇÕES ---------- */
+function renderProrrog(){
+  const concluidos=DB.filter(c=>bucketOf(c)==='concluido');
+  const naoConc=DB.filter(c=>bucketOf(c)!=='concluido');
+  const vencNF=naoConc.filter(c=>bucketOf(c)==='vencido');
+  const prorrog=naoConc.filter(c=>bucketOf(c)!=='vencido').sort((a,b)=>{const x=diasAVencer(a.vigenciaFim),y=diasAVencer(b.vigenciaFim);return(x==null?99999:x)-(y==null?99999:y);});
+  let html=`<div class="panel"><h2>Acompanhamento do ciclo de prorrogação</h2><div class="desc">Apenas contratos prorrogáveis (vigentes ou por vencer). Concluídos não entram${concluidos.length?` — ${concluidos.length} ocultado(s)`:''}. Ordenado por proximidade de vencimento.</div></div>`;
+  if(vencNF.length)html+=`<div class="alert d"><div>⚠ <b>${vencNF.length} contrato(s) com vigência expirada e não concluído(s)</b> — não prorrogáveis, exigem regularização: ${vencNF.map(c=>esc(c.contrato)).join(', ')}. <a href="#" onclick="goFiltered({venc:'vencido'});return false" style="color:inherit;font-weight:700;text-decoration:underline">Abrir →</a></div></div>`;
+  html+=`<div class="panel" style="padding:6px 6px"><table><thead><tr><th>Contrato</th><th>Objeto</th><th>Vigência fim</th><th>Dias</th><th>Proc. prorrogação</th><th>Fase / setor</th><th>Observações</th></tr></thead><tbody>`;
+  if(!prorrog.length)html+=`<tr><td colspan="7"><div class="empty">Nenhum contrato prorrogável.</div></td></tr>`;
+  prorrog.forEach(c=>{const d=diasAVencer(c.vigenciaFim);const dp=d==null?'<span class="pill neu">—</span>':d<=90?`<span class="pill warn">${d}</span>`:`<span class="pill ok">${d}</span>`;html+=`<tr class="clickable" onclick="openEdit('${c.id}')"><td><b>${esc(c.contrato||'—')}</b></td><td style="font-size:12px">${esc(c.objeto||'')}</td><td style="white-space:nowrap">${fmtDate(c.vigenciaFim)}</td><td>${dp}</td><td style="font-size:11.5px">${esc(c.processoProrrog||'—')}</td><td style="font-size:11.5px">${esc(c.faseSetor||'—')}</td><td style="font-size:11.5px;color:var(--muted)">${esc(c.observacoesProrrog||'')}</td></tr>`;});
+  html+=`</tbody></table><div class="sans" style="font-size:12px;color:var(--muted);padding:8px 10px">${prorrog.length} prorrogável(is) · ${vencNF.length} vencido(s) não concluído(s) · ${concluidos.length} concluído(s) ocultos</div></div>`;
+  return html;
+}
+
+/* ---------- REPACTUAÇÕES ---------- */
+function renderRepact(){
+  const comRep=DB.filter(c=>c.repactuacao);
+  const semRep=DB.filter(c=>!c.repactuacao&&c.tipoValor==='continuo');
+  let lista=comRep.slice();
+  if(state.repStatus.length)lista=lista.filter(c=>state.repStatus.includes((c.repactuacao.status||'').toUpperCase()));
+  lista.sort((a,b)=>{const o={'EM TRÂMITE':0,'PENDENTE':1,'CONCLUÍDA':2,'NÃO HÁ PEDIDO':3};return(o[(a.repactuacao.status||'').toUpperCase()]??9)-(o[(b.repactuacao.status||'').toUpperCase()]??9);});
+  const statusCount={};comRep.forEach(c=>{const s=(c.repactuacao.status||'N/I').toUpperCase();statusCount[s]=(statusCount[s]||0)+1;});
+  let html=`<div class="panel"><h2>Controle de repactuações / reajustes</h2><div class="desc">Pedidos de repactuação e reajuste por contrato, importados do controle de repactuações. ${comRep.length} contrato(s) com registro de repactuação; ${semRep.length} contrato(s) contínuo(s) sem registro.</div>
+    <div class="chips" style="margin-top:4px">${REP_STATUS.map(s=>statusCount[s]?`<span class="chip" style="cursor:pointer;${state.repStatus.includes(s)?'outline:2px solid var(--verde2)':''}" onclick="toggleRepStatus('${s}')">${esc(s)}: ${statusCount[s]}</span>`:'').join('')}${state.repStatus.length?`<button class="btn btn-out btn-sm" onclick="state.repStatus=[];renderBody()">Limpar</button>`:''}</div>
+    <div class="legal-note">Repactuação (custos por CCT) e reajuste (índice) renovam preço sem consumir o limite de 25%. Contrato sem convenção coletiva (CCT) em regra não comporta repactuação — apenas reajuste por índice.</div></div>`;
+  html+=`<div class="panel" style="padding:6px 6px"><table><thead><tr><th>Contrato</th><th>Empresa / objeto</th><th>Prazo final</th><th>Repactuável</th><th>Processo</th><th>Data pedido</th><th>Status</th><th>Situação</th><th>Fiscal</th></tr></thead><tbody>`;
+  if(!lista.length)html+=`<tr><td colspan="9"><div class="empty">Nenhum registro de repactuação com o filtro atual.</div></td></tr>`;
+  lista.forEach(c=>{const r=c.repactuacao;html+=`<tr class="clickable" onclick="openEdit('${c.id}')"><td><b>${esc(c.contrato||'—')}</b></td><td>${esc(r.empresa||c.fornecedor||'')}<br><span style="color:var(--muted);font-size:11.5px">${esc(r.objeto||c.objeto||'')}</span></td><td style="white-space:nowrap">${fmtDate(r.prazoFinal)}</td><td>${esc(r.repactuavel||'—')}</td><td style="font-size:11px">${esc(r.processoRepactuacao||'—')}</td><td style="white-space:nowrap">${fmtDate(r.dataPedido)}</td><td><span class="pill ${pillRep(r.status)}">${esc(r.status||'—')}</span></td><td style="font-size:11.5px;color:var(--muted)">${esc(r.situacao||'')}</td><td style="font-size:12px">${esc(r.fiscalTitular||c.fiscalTitular||'')}</td></tr>`;});
+  html+=`</tbody></table></div>`;
+  if(semRep.length)html+=`<div class="panel"><h2 style="font-size:14px">Contratos contínuos sem registro de repactuação (${semRep.length})</h2><div class="desc">Verifique se há repactuação/reajuste pendente não lançado.</div><div class="sans" style="font-size:12.5px;color:var(--muted);line-height:1.8">${semRep.map(c=>`<span class="clickable" style="cursor:pointer;text-decoration:underline" onclick="openEdit('${c.id}')">${esc(c.contrato)}</span>`).join(' · ')}</div></div>`;
+  return html;
+}
+function toggleRepStatus(s){if(state.repStatus.includes(s))state.repStatus=state.repStatus.filter(x=>x!==s);else state.repStatus.push(s);renderBody();}
+
+/* ---------- HISTÓRICO (aditivos/apostilamentos global) ---------- */
+function allChanges(){const out=[];DB.forEach(c=>{(c.aditivos||[]).forEach(a=>out.push({...a,kind:'Aditivo',contrato:c.contrato,fornecedor:c.fornecedor,categoria:c.categoria,cid:c.id}));(c.apostilamentos||[]).forEach(a=>out.push({...a,kind:'Apostilamento',contrato:c.contrato,fornecedor:c.fornecedor,categoria:c.categoria,cid:c.id}));});return out;}
+const ADLAB={acrescimo:'Acréscimo',supressao:'Supressão',prazo:'Prorrog. de prazo',outro:'Outro objeto'};
+function renderHist(){
+  let ch=allChanges();
+  if(state.histKind)ch=ch.filter(x=>x.kind===state.histKind);
+  if(state.histBusca){const q=state.histBusca.toLowerCase();ch=ch.filter(x=>[x.contrato,x.fornecedor,x.objeto].some(v=>(v||'').toLowerCase().includes(q)));}
+  ch.sort((a,b)=>(b.data||'').localeCompare(a.data||''));
+  const nad=allChanges().filter(x=>x.kind==='Aditivo').length,nap=allChanges().filter(x=>x.kind==='Apostilamento').length;
+  let html=`<div class="panel"><h2>Histórico de aditivos e apostilamentos</h2><div class="desc">${nad} termos aditivos · ${nap} apostilamentos importados das planilhas. Clique numa linha para abrir o contrato.</div>
+    <div class="toolbar"><input type="text" class="search" placeholder="Buscar contrato, fornecedor, objeto…" value="${esc(state.histBusca)}" oninput="state.histBusca=this.value;renderBody()">
+    <select onchange="state.histKind=this.value;renderBody()"><option value="">Todos os tipos</option><option ${state.histKind==='Aditivo'?'selected':''}>Aditivo</option><option ${state.histKind==='Apostilamento'?'selected':''}>Apostilamento</option></select></div></div>`;
+  html+=`<div class="panel" style="padding:6px 6px"><table><thead><tr><th>Contrato</th><th>Fornecedor</th><th>Espécie</th><th>Nº</th><th>Data</th><th>Objeto</th><th>Δ Valor</th><th>Δ Vigência</th></tr></thead><tbody>`;
+  if(!ch.length)html+=`<tr><td colspan="8"><div class="empty">Nenhuma alteração encontrada.</div></td></tr>`;
+  ch.forEach(x=>{const kindb=x.kind==='Aditivo'?`<span class="badge ad">Aditivo${x.tipo?` · ${ADLAB[x.tipo]||x.tipo}`:''}</span>`:`<span class="badge ap">Apostilam.${x.tipo&&x.tipo!=='Outro objeto'?` · ${esc(x.tipo)}`:''}</span>`;
+    html+=`<tr class="clickable" onclick="openEdit('${x.cid}')"><td><b>${esc(x.contrato||'—')}</b><br><span style="font-size:11px;color:var(--muted)">${esc(x.categoria||'')}</span></td><td style="font-size:12px">${esc(x.fornecedor||'')}</td><td>${kindb}</td><td>${esc(x.numero||'')}</td><td style="white-space:nowrap">${fmtDate(x.data)}</td><td style="font-size:12px">${esc(x.objeto||'')}</td><td>${x.alterouValor?'<span class="pill ok" style="font-size:10px">sim</span>':'<span style="color:var(--muted)">—</span>'}</td><td>${x.alterouVigencia?'<span class="pill info" style="font-size:10px">sim</span>':'<span style="color:var(--muted)">—</span>'}</td></tr>`;});
+  html+=`</tbody></table><div class="sans" style="font-size:12px;color:var(--muted);padding:8px 10px">${ch.length} registro(s).</div></div>`;
+  return html;
+}
+
+/* ---------- SOBRE ---------- */
+function renderSobre(){
+  return `<div class="panel"><h2>Sobre a ferramenta</h2><p class="sans" style="font-size:13.5px;line-height:1.7;color:#33403a">Ferramenta interna de coordenação da CFCC para gestão dos contratos administrativos da DPE/RN. Base construída a partir das planilhas de fiscais/gestores (inclui a aba de aditivos e apostilamentos), de prorrogações e de repactuações. Permite edição, novos contratos e lançamento de aditivos, apostilamentos e repactuações. Persistência local (localStorage); use o backup JSON para transportar.</p>
+    <div class="section-t">Decisões metodológicas</div>
+    <ul class="sans" style="font-size:13px;line-height:1.8;color:#33403a;padding-left:18px">
+      <li><b>Contínuo vs. único.</b> Execução continuada = valor mensal; OC/aquisição e ARP = valor único. Não se somam num número global.</li>
+      <li><b>Situação efetiva automática.</b> Vencido/A vencer/Vigente derivam da vigência; Concluído/Suspenso/Renegociar são flags administrativas humanas. O campo gravado não é sobrescrito pelo tempo.</li>
+      <li><b>Limite de alteração.</b> 25% geral; 50% só p/ acréscimo em obra/reforma. Só acréscimo e supressão consomem. Aditivo de prazo/qualitativo e apostilamento não consomem.</li>
+      <li><b>Aditivos importados sem valor R$.</b> A planilha traz tipo/objeto/data e flags de alteração, não os valores — que devem ser lançados para o cálculo de limite.</li>
+      <li><b>Repactuação ≠ consumo de limite.</b> Renova preço por CCT (repactuação) ou índice (reajuste). Contrato sem CCT, em regra, só comporta reajuste.</li>
+    </ul>
+    <div class="legal-note">Disciplina normativa de referência: Lei 14.133/2021; IN SEGES/ME nº 05/2017; IN 98/2022. Teses jurisprudenciais sem números de acórdão. Nenhum conteúdo fabricado.</div></div>`;
+}
+
+/* ---------- MODAL ---------- */
+let editingId=null;
+function openEdit(id){if(MODE==='readonly')return;editingId=id;const c=id?structuredClone(DB.find(x=>x.id===id)):blankContract();window._draft=c;drawModal(c);}
+function blankContract(){return{id:uid(),categoria:'TERCEIRIZADAS',tipoValor:'continuo',fornecedor:'',cnpj:'',objeto:'',sei:'',processoAdm:'',contrato:'',valorMensal:null,valorAnual:null,valorTotal:null,vigenciaInicio:'',vigenciaFim:'',situacao:'VIGENTE',fiscalTitular:'',fiscalSubstituto:'',gestorTitular:'',gestorSubstituto:'',portariaNum:'',portariaData:'',regime:'Lei 14.133/2021',valorInicialAtualizado:null,obraReforma:false,aditivos:[],apostilamentos:[],processoProrrog:'',faseSetor:'',observacoesProrrog:'',repactuacao:null,observacoes:''};}
+function fld(lab,key,type,c){const v=c[key]==null?'':c[key];return`<div class="field"><label>${lab}</label><input type="${type}" value="${esc(v)}" oninput="_draft['${key}']=this.${type==='number'?'valueAsNumber':'value'}"></div>`;}
+function drawModal(c){
+  const L=calcLimite(c);
+  const consome=t=>t==='acrescimo'||t==='supressao';
+  const adopts=t=>['acrescimo','supressao','prazo','outro'].map(o=>`<option value="${o}" ${t===o?'selected':''}>${ADLAB[o]}</option>`).join('');
+  const apopts=t=>['Reajuste','Repactuação','Revisão','Outro objeto'].map(o=>`<option ${t===o?'selected':''}>${o}</option>`).join('');
+  const adRows=(c.aditivos||[]).map((a,i)=>`<tr><td><input value="${esc(a.numero||'')}" onchange="editAdd(${i},'numero',this.value)"></td><td><select onchange="editAdd(${i},'tipo',this.value)">${adopts(a.tipo)}</select></td><td><input type="number" value="${a.valor==null?'':a.valor}" placeholder="${consome(a.tipo)?'R$':'n/c'}" onchange="editAdd(${i},'valor',this.value)"></td><td><input type="date" value="${esc(a.data||'')}" onchange="editAdd(${i},'data',this.value)"></td><td><input value="${esc(a.objeto||'')}" onchange="editAdd(${i},'objeto',this.value)">${a.tipo==='prazo'?`<input type="date" title="Nova vigência fim (atualiza o contrato)" value="${esc(a.novaVigenciaFim||'')}" onchange="editAdd(${i},'novaVigenciaFim',this.value)" style="margin-top:3px">`:''}</td><td><button class="btn btn-danger btn-sm" onclick="delAditivo(${i})">×</button></td></tr>`).join('');
+  const apRows=(c.apostilamentos||[]).map((a,i)=>`<tr><td><input value="${esc(a.numero||'')}" onchange="editAp(${i},'numero',this.value)"></td><td><select onchange="editAp(${i},'tipo',this.value)">${apopts(a.tipo)}</select></td><td><input type="number" value="${a.valor==null?'':a.valor}" placeholder="${a.tipo==='Outro objeto'?'—':'R$'}" onchange="editAp(${i},'valor',this.value)"></td><td><input type="date" value="${esc(a.data||'')}" onchange="editAp(${i},'data',this.value)"></td><td><input value="${esc(a.objeto||'')}" onchange="editAp(${i},'objeto',this.value)"></td><td><button class="btn btn-danger btn-sm" onclick="delApost(${i})">×</button></td></tr>`).join('');
+  const r=c.repactuacao||{};
+  document.getElementById('modalRoot').innerHTML=`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal">
+    <div class="modal-head"><h3>${editingId?'Editar contrato':'Novo contrato'}</h3><button class="x" onclick="closeModal()">×</button></div>
+    <div class="modal-body">
+      <div class="section-t">Identificação</div>
+      <div class="fgrid">
+        <div class="field"><label>Categoria</label><select onchange="_draft.categoria=this.value">${CATEGORIAS.map(x=>`<option ${c.categoria===x?'selected':''}>${x}</option>`).join('')}</select></div>
+        <div class="field"><label>Tipo de valor</label><select onchange="_draft.tipoValor=this.value;drawModal(_draft)"><option value="continuo" ${c.tipoValor==='continuo'?'selected':''}>Contínuo — pagamento mensal</option><option value="demanda" ${c.tipoValor==='demanda'?'selected':''}>Contínuo por demanda (manutenção/seguro/licença)</option><option value="unico" ${c.tipoValor==='unico'?'selected':''}>Aquisição única (OC / ARP)</option></select></div>
+        ${fld('Nº do contrato','contrato','text',c)}${fld('Fornecedor','fornecedor','text',c)}${fld('CNPJ / CPF','cnpj','text',c)}
+        <div class="field full"><label>Objeto</label><input type="text" value="${esc(c.objeto)}" oninput="_draft.objeto=this.value"></div>
+        ${fld('Processo SEI','sei','text',c)}${fld('Processo administrativo','processoAdm','text',c)}
+      </div>
+      <div class="section-t">Valores e vigência</div>
+      <div class="fgrid">${c.tipoValor==='continuo'?fld('Valor mensal (R$)','valorMensal','number',c)+fld('Valor anual (R$)','valorAnual','number',c):c.tipoValor==='demanda'?fld('Valor global / anual (R$)','valorTotal','number',c)+fld('Valor mensal registrado (R$)','valorMensal','number',c):fld('Valor total (R$)','valorTotal','number',c)}${fld('Vigência início','vigenciaInicio','date',c)}${fld('Vigência fim','vigenciaFim','date',c)}<div class="field"><label>Situação administrativa</label><select onchange="_draft.situacao=this.value;drawModal(_draft)">${SITUACOES_ADMIN.map(x=>`<option ${c.situacao===x?'selected':''}>${x}</option>`).join('')}</select></div><div class="field"><label>Situação efetiva (automática)</label><div style="display:flex;align-items:center;gap:8px;padding:6px 0"><span class="pill ${pillSit(situacaoEfetiva(c))}">${esc(situacaoEfetiva(c))}</span><span class="sans" style="font-size:11.5px;color:var(--muted)">${(()=>{const d=diasAVencer(c.vigenciaFim);return d==null?'indeterminada/sem data':d<0?`${Math.abs(d)} dia(s) vencida`:`${d} dia(s) p/ vencer`;})()}</span></div></div></div>
+      <div class="section-t">Fiscalização e gestão</div>
+      <div class="fgrid">${fld('Fiscal titular','fiscalTitular','text',c)}${fld('Fiscal substituto','fiscalSubstituto','text',c)}${fld('Gestor titular','gestorTitular','text',c)}${fld('Gestor substituto','gestorSubstituto','text',c)}${fld('Portaria nº','portariaNum','text',c)}${fld('Portaria data','portariaData','date',c)}</div>
+      <div class="section-t">Controle de prorrogação</div>
+      <div class="fgrid">${fld('Processo de prorrogação','processoProrrog','text',c)}${fld('Fase / setor','faseSetor','text',c)}<div class="field full"><label>Observações da prorrogação</label><input type="text" value="${esc(c.observacoesProrrog)}" oninput="_draft.observacoesProrrog=this.value"></div></div>
+      <div class="section-t">Repactuação / reajuste</div>
+      <div class="fgrid">
+        <div class="field"><label>Status</label><select onchange="repField('status',this.value);drawModal(_draft)"><option value="">— sem registro —</option>${REP_STATUS.map(s=>`<option ${r.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
+        <div class="field"><label>Repactuável (tem CCT?)</label><select onchange="repField('repactuavel',this.value)"><option value="">—</option><option ${r.repactuavel==='Sim'?'selected':''}>Sim</option><option ${r.repactuavel==='Não'?'selected':''}>Não</option></select></div>
+        <div class="field"><label>Processo de repactuação</label><input type="text" value="${esc(r.processoRepactuacao||'')}" oninput="repField('processoRepactuacao',this.value)"></div>
+        <div class="field"><label>Data do pedido</label><input type="date" value="${esc(r.dataPedido||'')}" oninput="repField('dataPedido',this.value)"></div>
+        <div class="field"><label>Prazo final do contrato</label><input type="date" value="${esc(r.prazoFinal||'')}" oninput="repField('prazoFinal',this.value)"></div>
+        <div class="field full"><label>Situação (descrição)</label><input type="text" value="${esc(r.situacao||'')}" oninput="repField('situacao',this.value)"></div>
+      </div>
+      <div class="section-t">Limite de alteração contratual</div>
+      <div class="fgrid"><div class="field"><label>Regime jurídico</label><select onchange="_draft.regime=this.value">${REGIMES.map(x=>`<option ${c.regime===x?'selected':''}>${x}</option>`).join('')}</select></div>${fld('Valor inicial atualizado (base) (R$)','valorInicialAtualizado','number',c)}<div class="field full"><label style="display:flex;gap:8px;align-items:center;text-transform:none;font-size:13px"><input type="checkbox" ${c.obraReforma?'checked':''} onchange="_draft.obraReforma=this.checked;drawModal(_draft)" style="width:auto"> Acréscimo refere-se a reforma de edifício/equipamento (teto 50%)</label></div></div>
+      ${c.valorInicialAtualizado!=null?`<div style="margin-top:6px"><div class="gauge">${gauge('Acréscimos',L.pctAcr,L.tetoAcr,L.acr,L.dispAcr,L.excedeAcr)}${gauge('Supressões',L.pctSup,L.tetoSup,L.sup,L.dispSup,L.excedeSup)}</div></div>`:'<div class="alert i" style="margin-top:6px">ℹ Informe o valor inicial atualizado para calcular o consumo.</div>'}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:8px">
+        <div><div class="section-t">Aditivos</div><div class="sans" style="font-size:11px;color:var(--muted);margin:-6px 0 8px">Só acréscimo e supressão consomem o limite. Prazo e outros objetos são registro (n/c = não consome).</div><table class="mini-tbl"><thead><tr><th>Nº</th><th>Tipo</th><th>Valor</th><th>Data</th><th>Objeto</th><th></th></tr></thead><tbody>${adRows||'<tr><td colspan="6" style="color:var(--muted)">Nenhum.</td></tr>'}</tbody></table><div class="fgrid" style="margin-top:8px;grid-template-columns:1fr 1fr"><select id="adTipo"><option value="acrescimo">Acréscimo</option><option value="supressao">Supressão</option><option value="prazo">Prorrogação de prazo</option><option value="outro">Outro objeto</option></select><input id="adNum" type="text" placeholder="Nº (ex.: 1º)"><input id="adVal" type="number" placeholder="Valor R$ (acr./supr.)"><input id="adData" type="date"><input id="adObj" type="text" placeholder="Objeto / descrição" style="grid-column:1/-1"></div><div class="field" style="margin-top:8px"><label>Nova vigência fim (p/ prorrogação — atualiza a vigência)</label><input id="adNovaVig" type="date"></div><button class="btn btn-out btn-sm add-row-btn" onclick="addAditivo()">+ Adicionar aditivo</button></div>
+        <div><div class="section-t">Apostilamentos</div><div class="sans" style="font-size:11px;color:var(--muted);margin:-6px 0 8px">Reajuste/repactuação/revisão atualizam a base. "Outro objeto" não altera base.</div><table class="mini-tbl"><thead><tr><th>Nº</th><th>Tipo</th><th>Valor</th><th>Data</th><th>Objeto</th><th></th></tr></thead><tbody>${apRows||'<tr><td colspan="6" style="color:var(--muted)">Nenhum.</td></tr>'}</tbody></table><div class="fgrid" style="margin-top:8px;grid-template-columns:1fr 1fr"><select id="apTipo"><option>Reajuste</option><option>Repactuação</option><option>Revisão</option><option>Outro objeto</option></select><input id="apNum" type="text" placeholder="Nº"><input id="apVal" type="number" placeholder="Novo valor base R$"><input id="apData" type="date"><input id="apObj" type="text" placeholder="Objeto / descrição" style="grid-column:1/-1"></div><button class="btn btn-out btn-sm add-row-btn" onclick="addApost()">+ Adicionar apostilamento</button></div>
+      </div>
+      <div class="section-t">Observações gerais</div><textarea style="width:100%;min-height:60px" oninput="_draft.observacoes=this.value">${esc(c.observacoes)}</textarea>
+    </div>
+    <div class="modal-foot">${editingId?'<button class="btn btn-danger" onclick="delContract()">Excluir contrato</button>':''}<button class="btn btn-out" onclick="closeModal()">Cancelar</button><button class="btn btn-pri" onclick="saveContract()">Salvar</button></div>
+  </div></div>`;
+}
+function repField(k,v){if(!_draft.repactuacao)_draft.repactuacao={};_draft.repactuacao[k]=v; if(k==='status'&&!v){ if(!Object.values(_draft.repactuacao).some(x=>x))_draft.repactuacao=null; }}
+function addAditivo(){const tipo=document.getElementById('adTipo').value;const v=parseFloat(document.getElementById('adVal').value);if((tipo==='acrescimo'||tipo==='supressao')&&isNaN(v)){alert('Acréscimo e supressão exigem valor.');return;}const nv=document.getElementById('adNovaVig').value;_draft.aditivos=_draft.aditivos||[];_draft.aditivos.push({tipo,numero:document.getElementById('adNum').value,valor:isNaN(v)?null:v,data:document.getElementById('adData').value,objeto:document.getElementById('adObj').value,novaVigenciaFim:nv||null});if(tipo==='prazo'&&nv)_draft.vigenciaFim=nv;drawModal(_draft);}
+function delAditivo(i){_draft.aditivos.splice(i,1);drawModal(_draft);}
+function editAdd(i,f,v){const a=_draft.aditivos[i];if(!a)return;if(f==='valor'){const n=parseFloat(v);a.valor=isNaN(n)?null:n;}else{a[f]=v;}if(f==='novaVigenciaFim'&&v)_draft.vigenciaFim=v;if(f==='tipo'||f==='valor'||f==='novaVigenciaFim')drawModal(_draft);}
+function editAp(i,f,v){const a=_draft.apostilamentos[i];if(!a)return;if(f==='valor'){const n=parseFloat(v);a.valor=isNaN(n)?null:n;if(a.tipo!=='Outro objeto'&&!isNaN(n))_draft.valorInicialAtualizado=n;}else{a[f]=v;}if(f==='tipo'||f==='valor')drawModal(_draft);}
+function addApost(){const tipo=document.getElementById('apTipo').value;const v=parseFloat(document.getElementById('apVal').value);_draft.apostilamentos=_draft.apostilamentos||[];_draft.apostilamentos.push({tipo,numero:document.getElementById('apNum').value,valor:isNaN(v)?null:v,data:document.getElementById('apData').value,objeto:document.getElementById('apObj').value});if(tipo!=='Outro objeto'&&!isNaN(v))_draft.valorInicialAtualizado=v;drawModal(_draft);}
+function delApost(i){_draft.apostilamentos.splice(i,1);drawModal(_draft);}
+function saveContract(){const c=_draft;c._v=(c._v||1)+1;c._ts=Date.now();c._by=(window.Sync&&Sync.userName)||'';if(editingId){const idx=DB.findIndex(x=>x.id===editingId);DB[idx]=c;}else DB.push(c);save();closeModal();render();}
+function delContract(){if(!confirm('Excluir este contrato permanentemente?'))return;const id=editingId;const c=DB.find(x=>x.id===id);const t=loadTomb();t.push({id,_v:((c&&c._v)||1)+1});saveTomb(t);DB=DB.filter(x=>x.id!==id);if(window.Sync){Sync.tombstones.push({id,_v:((c&&c._v)||1)+1});}save();closeModal();render();}
+function closeModal(){document.getElementById('modalRoot').innerHTML='';editingId=null;}
+
+/* ---------- EXPORT ---------- */
+function exportJSON(){dl(new Blob([JSON.stringify(DB,null,1)],{type:'application/json'}),`backup_contratos_${today()}.json`);}
+function importJSON(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!Array.isArray(d))throw new Error('formato');if(confirm(`Restaurar ${d.length} contratos? Substitui a base atual.`)){DB=d;save();render();}}catch(err){alert('Arquivo inválido: '+err.message);}};r.readAsText(f);}
+function exportReadonly(){let out=PAGE_TEMPLATE.replace('__SEED__',JSON.stringify(DB)).replace('__SNAPSHOT__',JSON.stringify(today()));dl(new Blob([out],{type:'text/html'}),`visualizacao_contratos_${today()}.html`);}
+function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
+function today(){return new Date().toISOString().slice(0,10);}
+
+function renderBody(){const v=document.getElementById('view');const m={dash:renderDash,contratos:renderContratos,limite:renderLimite,prorrog:renderProrrog,repact:renderRepact,hist:renderHist,sobre:renderSobre};v.innerHTML=(m[state.tab]||renderDash)();}
+function render(){renderTabs();renderBody();}
+
+let PAGE_TEMPLATE='';
+window.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('yr').textContent=new Date().getFullYear();
+  document.body.classList.toggle('readonly',MODE==='readonly');
+  document.getElementById('modeBadge').textContent=MODE==='readonly'?'Somente leitura':'Edição';
+  document.getElementById('modeBadge').className='pill '+(MODE==='readonly'?'neu':'ok');
+  if(SNAPSHOT){const b=document.getElementById('snapBanner');b.style.display='block';b.textContent=`SNAPSHOT de ${fmtDate(SNAPSHOT)} — somente leitura · dados NÃO atualizados em tempo real`;}
+  render();
+});
+</script>
+<script id="cfcc-sync">
+/* ===== Camadas de proteção: snapshots rotativos (7 dias) ===== */
+const Snapshots={maybe(){const today=new Date().toISOString().slice(0,10);try{const meta=JSON.parse(localStorage.getItem('cfcc_snap_meta')||'{}');if(meta.last===today)return;meta.last=today;localStorage.setItem('cfcc_snap_'+today,localStorage.getItem(STORE_KEY)||'[]');const keys=Object.keys(localStorage).filter(k=>k.startsWith('cfcc_snap_')&&k!=='cfcc_snap_meta').sort();while(keys.length>7)localStorage.removeItem(keys.shift());localStorage.setItem('cfcc_snap_meta',JSON.stringify(meta));}catch(e){}}};
+
+/* ===== IndexedDB: guarda o handle da pasta compartilhada ===== */
+const idb={open(){return new Promise((res,rej)=>{const r=indexedDB.open('cfcc-sync',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});},async set(k,v){const db=await this.open();return new Promise((res,rej)=>{const tx=db.transaction('kv','readwrite');tx.objectStore('kv').put(v,k);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);});},async get(k){const db=await this.open();return new Promise((res,rej)=>{const tx=db.transaction('kv','readonly');const rq=tx.objectStore('kv').get(k);rq.onsuccess=()=>res(rq.result);rq.onerror=()=>rej(rq.error);});}};
+
+/* ===== Sincronização compartilhada por pasta (modelo COAG) ===== */
+const Sync={
+  connected:false,dirHandle:null,userName:'',userId:'',poll:null,heart:null,pushTimer:null,tombstones:[],FILE:'contratos.json',PRES:'presenca.json',
+  newId(){const id='u'+Math.random().toString(36).slice(2,8);localStorage.setItem('cfcc_uid',id);return id;},
+  async init(){ if(MODE==='readonly')return; this.tombstones=loadTomb(); try{const h=await idb.get('dirHandle'); if(h){ this.dirHandle=h; this.userId=localStorage.getItem('cfcc_uid')||this.newId(); this.userName=localStorage.getItem('cfcc_uname')||''; this.updateUI('saved'); } }catch(e){} },
+  async connect(){
+    if(!window.showDirectoryPicker){alert('Este navegador não suporta pasta compartilhada. Use Google Chrome ou Microsoft Edge no computador.');return;}
+    try{ const h=await window.showDirectoryPicker({id:'cfcc-contratos',mode:'readwrite'}); this.dirHandle=h; await idb.set('dirHandle',h);
+      if(!this.userName){ const n=prompt('Seu nome (aparecerá para os demais usuários da pasta):',''); this.userName=(n||'').trim()||'Usuário'; localStorage.setItem('cfcc_uname',this.userName); }
+      this.userId=localStorage.getItem('cfcc_uid')||this.newId(); await this.firstSync(); this.start();
+    }catch(e){ if(e.name!=='AbortError') alert('Falha ao conectar pasta: '+e.message); }
+  },
+  async ensurePerm(){ if(!this.dirHandle)return false; const o={mode:'readwrite'}; try{ if(await this.dirHandle.queryPermission(o)==='granted')return true; return (await this.dirHandle.requestPermission(o))==='granted'; }catch(e){return false;} },
+  async readJSON(name){ try{const fh=await this.dirHandle.getFileHandle(name);const f=await fh.getFile();const t=await f.text();return t?JSON.parse(t):null;}catch(e){return null;} },
+  async writeJSON(name,obj){ const fh=await this.dirHandle.getFileHandle(name,{create:true}); const w=await fh.createWritable(); await w.write(JSON.stringify(obj)); await w.close(); },
+  mergeInto(remoteArr){ let changed=false; const byId={}; DB.forEach(c=>byId[c.id]=c); const tomb=new Set(loadTomb().map(t=>t.id)); (remoteArr||[]).forEach(r=>{ if(isPhantom(r)||tomb.has(r.id))return; const l=byId[r.id]; if(!l){DB.push(migrate(r));changed=true;} else if((r._v||0)>(l._v||0)){Object.assign(l,migrate(r));changed=true;} }); return changed; },
+  async firstSync(){ if(!(await this.ensurePerm()))return; const remote=await this.readJSON(this.FILE); if(remote&&remote.contratos){ const ch=this.mergeInto(remote.contratos); try{localStorage.setItem(STORE_KEY,JSON.stringify(DB));}catch(e){} if(ch)render(); } await this.push(); this.updateUI('ok'); },
+  async push(){ if(!this.dirHandle)return; if(!(await this.ensurePerm()))return; const remote=await this.readJSON(this.FILE); const map={}; ((remote&&remote.contratos)||[]).forEach(r=>map[r.id]=r); DB.forEach(l=>{ const r=map[l.id]; if(!r||(l._v||0)>=(r._v||0)) map[l.id]=l; }); (this.tombstones||[]).forEach(t=>{ const r=map[t.id]; if(r&&(t._v||0)>=(r._v||0)) delete map[t.id]; }); Object.keys(map).forEach(k=>{ if(isPhantom(map[k])) delete map[k]; }); await this.writeJSON(this.FILE,{schema:SCHEMA,atualizadoEm:Date.now(),contratos:Object.values(map)}); },
+  async pull(){ if(!this.dirHandle)return; if(!(await this.ensurePerm()))return; const remote=await this.readJSON(this.FILE); if(remote&&remote.contratos){ const open=document.getElementById('modalRoot').children.length>0; const ch=this.mergeInto(remote.contratos); if(ch){ try{localStorage.setItem(STORE_KEY,JSON.stringify(DB));}catch(e){} if(!open) render(); } } await this.presenceRead(); },
+  pushSoon(){ clearTimeout(this.pushTimer); this.pushTimer=setTimeout(()=>this.push().catch(()=>{}),800); },
+  tombstone(id){ const c=DB.find(x=>x.id===id); this.tombstones.push({id,_v:((c&&c._v)||1)+1}); },
+  async heartbeat(){ if(!this.dirHandle)return; if(!(await this.ensurePerm()))return; const p=(await this.readJSON(this.PRES))||{}; p[this.userId]={nome:this.userName,ts:Date.now()}; await this.writeJSON(this.PRES,p); },
+  async presenceRead(){ const p=(await this.readJSON(this.PRES))||{}; const now=Date.now(); const on=Object.entries(p).filter(([k,x])=>now-x.ts<90000).map(([k,x])=>x.nome); const el=document.getElementById('presence'); if(el) el.textContent= on.length?('● '+on.length+' online: '+on.join(', ')):''; },
+  start(){ this.connected=true; this.updateUI('ok'); clearInterval(this.poll); clearInterval(this.heart); this.heartbeat(); this.poll=setInterval(()=>this.pull().catch(()=>{}),5000); this.heart=setInterval(()=>this.heartbeat().catch(()=>{}),30000); },
+  stop(){ this.connected=false; clearInterval(this.poll); clearInterval(this.heart); this.updateUI('off'); const el=document.getElementById('presence'); if(el)el.textContent=''; },
+  updateUI(s){ const el=document.getElementById('syncStatus'); if(!el)return; if(s==='ok'){el.textContent='⇅ Compartilhado';el.className='pill ok readonly-hide';} else if(s==='saved'){el.textContent='⟳ Reconectar pasta';el.className='pill warn readonly-hide';} else {el.textContent='◌ Local';el.className='pill neu readonly-hide';} el.style.cursor='pointer'; },
+  async toggleMenu(){ if(!this.connected){ if(this.dirHandle&&await this.ensurePerm()){ this.userId=localStorage.getItem('cfcc_uid')||this.newId(); this.userName=localStorage.getItem('cfcc_uname')||'Usuário'; await this.firstSync(); this.start(); return; } this.connect(); } else { if(confirm('Desconectar a pasta compartilhada? O app volta ao modo local; os dados permanecem neste navegador.')) this.stop(); } }
+};
+window.Sync=Sync;
+
+/* ===== PWA: service worker + persistência ===== */
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){ window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{})); }
+if(navigator.storage&&navigator.storage.persist){ navigator.storage.persist().catch(()=>{}); }
+window.addEventListener('DOMContentLoaded',()=>{ Snapshots.maybe(); Sync.init(); });
+</script>
+<script id="tpl-grabber">(function(){let h='<!DOCTYPE html>\n'+document.documentElement.outerHTML;h=h.replace(/const SEED = [\s\S]*?;\n/,'const SEED = __SEED__;\n').replace(/const SNAPSHOT = [\s\S]*?\n/,'const SNAPSHOT = __SNAPSHOT__;\n');PAGE_TEMPLATE=h;})();</script>
+</body>
+</html>

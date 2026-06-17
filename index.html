@@ -159,6 +159,9 @@ function migrate(c){
   if(c.obraReforma===undefined) c.obraReforma=false;
   if(c.regime===undefined) c.regime=null;
   if(c.valorInicialAtualizado===undefined) c.valorInicialAtualizado=null;
+  if(c.valorServicos===undefined) c.valorServicos=null;
+  if(c.valorPecas===undefined) c.valorPecas=null;
+  if(c.composicaoPeriodo===undefined) c.composicaoPeriodo=null;
   c.aditivos.forEach(a=>{ if(a.objeto===undefined)a.objeto=''; });
   c.apostilamentos.forEach(a=>{ if(a.objeto===undefined)a.objeto=''; });
   if(c._v===undefined) c._v=1;
@@ -190,7 +193,7 @@ function uid(){return'C'+Date.now().toString(36)+Math.random().toString(36).slic
 function valorRef(c){return c.tipoValor==='continuo'?(c.valorMensal||0):c.tipoValor==='demanda'?(c.valorTotal!=null?c.valorTotal:(c.valorMensal||0)):(c.valorTotal||0);}
 function ativo(c){const s=situacaoEfetiva(c);return s!=='CONCLUÍDO'&&s!=='VENCIDO';}
 function bucketOf(c){const s=(c.situacao||'').toLowerCase();if(s==='finalizado'||s==='concluido'||s==='concluído')return'concluido';const d=diasAVencer(c.vigenciaFim);if(c.tipoValor==='unico'&&((d!=null&&d<0)||s==='vencido'))return'concluido';for(const[k,,fn]of VENC_BUCKETS){if(fn&&fn(d))return k;}return'indet';}
-function rotuloTipo(t){return t==='continuo'?'contínuo':t==='demanda'?'por demanda':'único';}
+function rotuloTipo(t){return t==='continuo'?'contínuo':t==='demanda'?'por demanda':'pagamento único';}
 function situacaoEfetiva(c){const s=(c.situacao||'').toLowerCase();if(s==='finalizado'||s==='concluido'||s==='concluído')return'CONCLUÍDO';if(s==='suspenso')return'SUSPENSO';const d=diasAVencer(c.vigenciaFim);if(c.tipoValor==='unico'&&((d!=null&&d<0)||s==='vencido'))return'CONCLUÍDO';if(d!=null&&d<0)return'VENCIDO';if(s==='renegociar')return'RENEGOCIAR';if(d==null)return'VIGENTE';if(d<=90)return'A VENCER';return'VIGENTE';}
 function pillSit(s){return s==='VIGENTE'?'ok':s==='A VENCER'?'info':s==='VENCIDO'?'danger':s==='RENEGOCIAR'?'warn':'neu';}
 function pillRep(s){s=(s||'').toUpperCase();return s==='EM TRÂMITE'?'info':s==='PENDENTE'?'warn':s==='CONCLUÍDA'?'ok':'neu';}
@@ -220,10 +223,10 @@ function renderDash(){
   let html='';
   if(!DB.length && MODE!=='readonly'){ html+=`<div class="alert i" style="margin-bottom:16px"><div>&#8505; <b>Nenhum contrato carregado.</b> Esta versão (GitHub) abre sem dados embarcados. Clique em <b>&#8220;&#9676; Local&#8221;</b> no topo e conecte a <b>pasta do SharePoint</b> (sincronizada localmente) que contém o arquivo <code>contratos.json</code> para carregar a base.</div></div>`; }
   html+=`<div class="kpis">
-    <div class="kpi"><div class="lab">Contratos ativos</div><div class="val">${ativos.length}</div><div class="note">${cont.length} contínuos · ${dem.length} por demanda · ${uni.length} únicos${nConcl?` · ${nConcl} concluídos/vencidos fora do cômputo`:''}</div></div>
+    <div class="kpi"><div class="lab">Contratos ativos</div><div class="val">${ativos.length}</div><div class="note">${cont.length} contínuos · ${dem.length} por demanda · ${uni.length} de pagamento único${nConcl?` · ${nConcl} concluídos/vencidos fora do cômputo`:''}</div></div>
     <div class="kpi azul"><div class="lab">Despesa mensal fixa (contínuos)</div><div class="val" style="font-size:22px">${BRL(mensalTot)}</div><div class="note">pagamento mensal · anualizável: ${BRL(mensalTot*12)}/ano</div></div>
     <div class="kpi ciano"><div class="lab">Contínuos por demanda (global)</div><div class="val" style="font-size:22px">${BRL(demTot)}</div><div class="note">manutenção/seguro/licença · valor registrado, rever base</div></div>
-    <div class="kpi warn"><div class="lab">Aquisição única (OC/ARP)</div><div class="val" style="font-size:22px">${BRL(unicoTot)}</div><div class="note">${uni.length} contrato(s) de aquisição/ARP ativo(s)</div></div>
+    <div class="kpi warn"><div class="lab">Aquisições / Pagamento único</div><div class="val" style="font-size:22px">${BRL(unicoTot)}</div><div class="note">${uni.length} contrato(s) de aquisição/ARP ativo(s)</div></div>
     <div class="kpi warn"><div class="lab">Em atenção de vigência</div><div class="val">${totAtencao}</div><div class="note">a vencer em até 90 dias ou já vencidos</div></div>
     <div class="kpi ciano"><div class="lab">Repactuações em curso</div><div class="val">${repAtivas}</div><div class="note">em trâmite ou pendentes</div></div>
   </div>`;
@@ -248,7 +251,7 @@ function renderDash(){
   html+=`<div class="grid2"><div class="panel"><h2>Contínuos por demanda (ativos)</h2><div class="desc">Manutenção, seguro, licenças: contínuos/renováveis, mas pagos por demanda — valor lido como global, não como mensalidade fixa. Clique para filtrar.</div>`;
   const demByCat={};dem.forEach(c=>{demByCat[c.categoria]=(demByCat[c.categoria]||0)+valorRef(c);});
   Object.entries(demByCat).sort((a,b)=>b[1]-a[1]).forEach(([cat,v])=>{html+=`<div class="row-click" onclick="goFiltered({cat:'${cat.replace(/'/g,"\\'")}'})"><span>${esc(cat)}</span><b>${BRL(v)}</b></div>`;});
-  html+=`</div><div class="panel"><h2>Aquisição única — OC/ARP (ativos)</h2><div class="desc">Pagamento único; encerram ao fim da vigência (não se renovam). Clique para filtrar.</div>`;
+  html+=`</div><div class="panel"><h2>Aquisições / Pagamento único (ativos)</h2><div class="desc">Pagamento único; encerram ao fim da vigência (não se renovam). Clique para filtrar.</div>`;
   const uniByCat={};uni.forEach(c=>{uniByCat[c.categoria]=(uniByCat[c.categoria]||0)+(c.valorTotal||0);});
   Object.entries(uniByCat).sort((a,b)=>b[1]-a[1]).forEach(([cat,v])=>{html+=`<div class="row-click" onclick="goFiltered({cat:'${cat.replace(/'/g,"\\'")}'})"><span>${esc(cat)}</span><b>${BRL(v)}</b></div>`;});
   html+=`</div></div>`;
@@ -325,7 +328,7 @@ function contractRow(c,dups){
     <td><b>${esc(c.contrato||'—')}</b>${dups.has(dupKeyOf(c))?' <span class="badge" style="background:#fcf3e0;color:#9a6608" title="Mesmo nº e fornecedor de outro registro — verifique duplicidade">DUP?</span>':''}<br><span class="tag-cat">${rotuloTipo(c.tipoValor)}</span></td>
     <td>${esc(c.fornecedor||'—')}<br><span style="color:var(--muted);font-size:11.5px">${esc(c.objeto||'')}</span></td>
     <td style="font-size:11.5px">${esc(c.categoria)}</td>
-    <td style="white-space:nowrap">${BRL(valorRef(c))}${dirty?'<br><span class="dq">⚠ revisar</span>':''}<br><span style="color:var(--muted);font-size:11px">${c.tipoValor==='continuo'?'/mês':'total'}</span></td>
+    <td style="white-space:nowrap">${BRL(valorRef(c))}${dirty?'<br><span class="dq">⚠ revisar</span>':''}${(c.valorServicos!=null||c.valorPecas!=null)?`<br><span style="color:var(--muted);font-size:10px">serv. ${BRL(c.valorServicos||0)} · peças ${BRL(c.valorPecas||0)}</span>`:''}<br><span style="color:var(--muted);font-size:11px">${c.tipoValor==='continuo'?'/mês':'total'}</span></td>
     <td style="white-space:nowrap">${fmtDate(c.vigenciaFim)}</td><td>${dpill}</td>
     <td><span class="pill ${pillSit(sefe)}">${esc(sefe)}</span> ${rep}</td>
     <td>${nalt?`<span class="badge">${nalt}</span>`:'—'}</td>
@@ -419,8 +422,10 @@ function renderSobre(){
 /* ---------- MODAL ---------- */
 let editingId=null;
 function openEdit(id){if(MODE==='readonly')return;editingId=id;const c=id?structuredClone(DB.find(x=>x.id===id)):blankContract();window._draft=c;drawModal(c);}
-function blankContract(){return{id:uid(),categoria:'TERCEIRIZADAS',tipoValor:'continuo',fornecedor:'',cnpj:'',objeto:'',sei:'',processoAdm:'',contrato:'',valorMensal:null,valorAnual:null,valorTotal:null,vigenciaInicio:'',vigenciaFim:'',situacao:'VIGENTE',fiscalTitular:'',fiscalSubstituto:'',gestorTitular:'',gestorSubstituto:'',portariaNum:'',portariaData:'',regime:'Lei 14.133/2021',valorInicialAtualizado:null,obraReforma:false,aditivos:[],apostilamentos:[],processoProrrog:'',faseSetor:'',observacoesProrrog:'',repactuacao:null,observacoes:''};}
+function blankContract(){return{id:uid(),categoria:'TERCEIRIZADAS',tipoValor:'continuo',fornecedor:'',cnpj:'',objeto:'',sei:'',processoAdm:'',contrato:'',valorMensal:null,valorAnual:null,valorTotal:null,valorServicos:null,valorPecas:null,composicaoPeriodo:null,vigenciaInicio:'',vigenciaFim:'',situacao:'VIGENTE',fiscalTitular:'',fiscalSubstituto:'',gestorTitular:'',gestorSubstituto:'',portariaNum:'',portariaData:'',regime:'Lei 14.133/2021',valorInicialAtualizado:null,obraReforma:false,aditivos:[],apostilamentos:[],processoProrrog:'',faseSetor:'',observacoesProrrog:'',repactuacao:null,observacoes:''};}
 function fld(lab,key,type,c){const v=c[key]==null?'':c[key];return`<div class="field"><label>${lab}</label><input type="${type}" value="${esc(v)}" oninput="_draft['${key}']=this.${type==='number'?'valueAsNumber':'value'}"></div>`;}
+function recalcComposicao(){const s=Number(_draft.valorServicos)||0,p=Number(_draft.valorPecas)||0,soma=s+p;if(_draft.composicaoPeriodo==='global')_draft.valorTotal=soma;else _draft.valorMensal=soma;const el=document.getElementById('compSoma');if(el)el.textContent=BRL(soma);}
+function toggleComposicao(on){if(on){if(_draft.composicaoPeriodo==null)_draft.composicaoPeriodo=(_draft.tipoValor==='unico'?'global':'mensal');recalcComposicao();}else{_draft.valorServicos=null;_draft.valorPecas=null;_draft.composicaoPeriodo=null;}drawModal(_draft);}
 function drawModal(c){
   const L=calcLimite(c);
   const consome=t=>t==='acrescimo'||t==='supressao';
@@ -435,13 +440,13 @@ function drawModal(c){
       <div class="section-t">Identificação</div>
       <div class="fgrid">
         <div class="field"><label>Categoria</label><select onchange="_draft.categoria=this.value">${CATEGORIAS.map(x=>`<option ${c.categoria===x?'selected':''}>${x}</option>`).join('')}</select></div>
-        <div class="field"><label>Tipo de valor</label><select onchange="_draft.tipoValor=this.value;drawModal(_draft)"><option value="continuo" ${c.tipoValor==='continuo'?'selected':''}>Contínuo — pagamento mensal</option><option value="demanda" ${c.tipoValor==='demanda'?'selected':''}>Contínuo por demanda (manutenção/seguro/licença)</option><option value="unico" ${c.tipoValor==='unico'?'selected':''}>Aquisição única (OC / ARP)</option></select></div>
+        <div class="field"><label>Tipo de valor</label><select onchange="_draft.tipoValor=this.value;drawModal(_draft)"><option value="continuo" ${c.tipoValor==='continuo'?'selected':''}>Contínuo — pagamento mensal</option><option value="demanda" ${c.tipoValor==='demanda'?'selected':''}>Contínuo por demanda (manutenção/seguro/licença)</option><option value="unico" ${c.tipoValor==='unico'?'selected':''}>Aquisição / Pagamento único (OC / ARP)</option></select></div>
         ${fld('Nº do contrato','contrato','text',c)}${fld('Fornecedor','fornecedor','text',c)}${fld('CNPJ / CPF','cnpj','text',c)}
         <div class="field full"><label>Objeto</label><input type="text" value="${esc(c.objeto)}" oninput="_draft.objeto=this.value"></div>
         ${fld('Processo SEI','sei','text',c)}${fld('Processo administrativo','processoAdm','text',c)}
       </div>
       <div class="section-t">Valores e vigência</div>
-      <div class="fgrid">${c.tipoValor==='continuo'?fld('Valor mensal (R$)','valorMensal','number',c)+fld('Valor anual (R$)','valorAnual','number',c):c.tipoValor==='demanda'?fld('Valor global / anual (R$)','valorTotal','number',c)+fld('Valor mensal registrado (R$)','valorMensal','number',c):fld('Valor total (R$)','valorTotal','number',c)}${fld('Vigência início','vigenciaInicio','date',c)}${fld('Vigência fim','vigenciaFim','date',c)}<div class="field"><label>Situação administrativa</label><select onchange="_draft.situacao=this.value;drawModal(_draft)">${SITUACOES_ADMIN.map(x=>`<option ${c.situacao===x?'selected':''}>${x}</option>`).join('')}</select></div><div class="field"><label>Situação efetiva (automática)</label><div style="display:flex;align-items:center;gap:8px;padding:6px 0"><span class="pill ${pillSit(situacaoEfetiva(c))}">${esc(situacaoEfetiva(c))}</span><span class="sans" style="font-size:11.5px;color:var(--muted)">${(()=>{const d=diasAVencer(c.vigenciaFim);return d==null?'indeterminada/sem data':d<0?`${Math.abs(d)} dia(s) vencida`:`${d} dia(s) p/ vencer`;})()}</span></div></div></div>
+      <div class="fgrid">${(()=>{const composOn=(c.valorServicos!=null||c.valorPecas!=null||c.composicaoPeriodo!=null);const soma=(Number(c.valorServicos)||0)+(Number(c.valorPecas)||0);return `<div class="field" style="grid-column:1/-1"><label class="sans" style="font-weight:600;display:flex;gap:7px;align-items:center;cursor:pointer"><input type="checkbox" ${composOn?'checked':''} onchange="toggleComposicao(this.checked)"> Separar valor entre serviços e peças (global = soma)</label></div>`+(composOn?`<div class="field"><label>Periodicidade</label><select onchange="_draft.composicaoPeriodo=this.value;recalcComposicao();drawModal(_draft)"><option value="mensal" ${c.composicaoPeriodo==='global'?'':'selected'}>Mensal</option><option value="global" ${c.composicaoPeriodo==='global'?'selected':''}>Global / anual</option></select></div><div class="field"><label>Valor de serviços (R$)</label><input type="number" value="${c.valorServicos==null?'':c.valorServicos}" oninput="_draft.valorServicos=this.valueAsNumber;recalcComposicao()"></div><div class="field"><label>Valor de peças / materiais (R$)</label><input type="number" value="${c.valorPecas==null?'':c.valorPecas}" oninput="_draft.valorPecas=this.valueAsNumber;recalcComposicao()"></div><div class="field"><label>Valor global (soma)</label><div style="padding:7px 0;font-weight:700;color:var(--verde)"><span id="compSoma">${BRL(soma)}</span> <span class="sans" style="font-weight:400;color:var(--muted);font-size:11px">· ${c.composicaoPeriodo==='global'?'global/anual':'mensal'}</span></div></div>`:(c.tipoValor==='continuo'?fld('Valor mensal (R$)','valorMensal','number',c)+fld('Valor anual (R$)','valorAnual','number',c):c.tipoValor==='demanda'?fld('Valor global / anual (R$)','valorTotal','number',c)+fld('Valor mensal registrado (R$)','valorMensal','number',c):fld('Valor total (R$)','valorTotal','number',c)));})()}${fld('Vigência início','vigenciaInicio','date',c)}${fld('Vigência fim','vigenciaFim','date',c)}<div class="field"><label>Situação administrativa</label><select onchange="_draft.situacao=this.value;drawModal(_draft)">${SITUACOES_ADMIN.map(x=>`<option ${c.situacao===x?'selected':''}>${x}</option>`).join('')}</select></div><div class="field"><label>Situação efetiva (automática)</label><div style="display:flex;align-items:center;gap:8px;padding:6px 0"><span class="pill ${pillSit(situacaoEfetiva(c))}">${esc(situacaoEfetiva(c))}</span><span class="sans" style="font-size:11.5px;color:var(--muted)">${(()=>{const d=diasAVencer(c.vigenciaFim);return d==null?'indeterminada/sem data':d<0?`${Math.abs(d)} dia(s) vencida`:`${d} dia(s) p/ vencer`;})()}</span></div></div></div>
       <div class="section-t">Fiscalização e gestão</div>
       <div class="fgrid">${fld('Fiscal titular','fiscalTitular','text',c)}${fld('Fiscal substituto','fiscalSubstituto','text',c)}${fld('Gestor titular','gestorTitular','text',c)}${fld('Gestor substituto','gestorSubstituto','text',c)}${fld('Portaria nº','portariaNum','text',c)}${fld('Portaria data','portariaData','date',c)}</div>
       <div class="section-t">Controle de prorrogação</div>

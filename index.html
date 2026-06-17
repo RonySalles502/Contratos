@@ -218,7 +218,9 @@ function renderDash(){
     <div class="kpi"><div class="lab">Contratos ativos</div><div class="val">${ativos.length}</div><div class="note">${cont.length} contínuos · ${dem.length} por demanda · ${uni.length} únicos${nConcl?` · ${nConcl} concluídos/vencidos fora do cômputo`:''}</div></div>
     <div class="kpi azul"><div class="lab">Despesa mensal fixa (contínuos)</div><div class="val" style="font-size:22px">${BRL(mensalTot)}</div><div class="note">pagamento mensal · anualizável: ${BRL(mensalTot*12)}/ano</div></div>
     <div class="kpi ciano"><div class="lab">Contínuos por demanda (global)</div><div class="val" style="font-size:22px">${BRL(demTot)}</div><div class="note">manutenção/seguro/licença · valor registrado, rever base</div></div>
-    <div class="kpi warn"><div class="lab">Aquisição única (OC/ARP)</div><div class="val" style="font-size:22px">${BRL(unicoTot)}</div><div class="note">${totAtencao} em atenção de vigência · ${repAtivas} repactuação(ões)</div></div>
+    <div class="kpi warn"><div class="lab">Aquisição única (OC/ARP)</div><div class="val" style="font-size:22px">${BRL(unicoTot)}</div><div class="note">${uni.length} contrato(s) de aquisição/ARP ativo(s)</div></div>
+    <div class="kpi warn"><div class="lab">Em atenção de vigência</div><div class="val">${totAtencao}</div><div class="note">a vencer em até 90 dias ou já vencidos</div></div>
+    <div class="kpi ciano"><div class="lab">Repactuações em curso</div><div class="val">${repAtivas}</div><div class="note">em trâmite ou pendentes</div></div>
   </div>`;
   // faixas
   const counts={};VENC_BUCKETS.forEach(b=>counts[b[0]]=0);cs.forEach(c=>counts[bucketOf(c)]++);

@@ -99,6 +99,11 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--verde2)}
 .add-row-btn{margin-top:8px}
 .empty{text-align:center;padding:50px 20px;color:var(--muted);font-family:'Segoe UI',sans-serif}
 .tag-cat{font-family:'Segoe UI',sans-serif;font-size:10.5px;font-weight:700;color:var(--azul);text-transform:uppercase;letter-spacing:.3px}
+tr.grp td{background:#eef4f0;font-family:'Segoe UI',sans-serif;padding:9px 12px;border-top:2px solid var(--verde2)}
+tr.grp .grp-name{font-weight:700;color:var(--verde);font-size:12.5px;text-transform:uppercase;letter-spacing:.4px}
+tr.grp .grp-meta{color:var(--muted);font-size:11.5px;margin-left:10px}
+tr.grp.concl td{background:#f3f1ee;border-top:2px solid #b9a98c}
+tr.grp.concl .grp-name{color:#6b5a3c}
 .x{margin-left:auto;background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1}.x:hover{color:var(--danger)}
 .foot{text-align:center;font-family:'Segoe UI',sans-serif;font-size:11.5px;color:var(--muted);padding:30px 16px 50px}
 .dq{font-family:'Segoe UI',sans-serif;font-size:11px;color:var(--warn);font-weight:600}
@@ -271,7 +276,7 @@ function filtered(){
   if(state.filtroVencs.length)cs=cs.filter(c=>state.filtroVencs.includes(bucketOf(c)));
   if(state.busca){const q=state.busca.toLowerCase();cs=cs.filter(c=>[c.fornecedor,c.objeto,c.contrato,c.cnpj,c.fiscalTitular,c.sei].some(v=>(v||'').toLowerCase().includes(q)));}
   const k=state.sortKey;
-  cs.sort((a,b)=>{let x=a[k],y=b[k];if(k==='valorRef'){x=valorRef(a);y=valorRef(b);}x=x==null?'':x;y=y==null?'':y;return(x>y?1:x<y?-1:0)*state.sortDir;});
+  cs.sort((a,b)=>{let x=a[k],y=b[k];if(k==='valorRef'){x=valorRef(a);y=valorRef(b);}const ex=(x==null||x===''),ey=(y==null||y==='');if(ex&&!ey)return 1;if(ey&&!ex)return -1;if(ex&&ey)return 0;return(x>y?1:x<y?-1:0)*state.sortDir;});
   return cs;
 }
 function fchips(field,prefix,labelFn){return state[field].map(v=>`<span class="chip">${esc(prefix+(labelFn?labelFn(v):v))}<button onclick="removeFilter('${field}',decodeURIComponent('${encodeURIComponent(v)}'))">×</button></span>`).join('');}
@@ -289,26 +294,42 @@ function renderContratos(){
     <button class="btn btn-pri readonly-hide" onclick="openEdit(null)">+ Novo contrato</button>
   </div>${chips()}`;
   html+=`<div class="panel" style="padding:6px 6px"><table><thead><tr>${th('contrato','Contrato')}${th('fornecedor','Fornecedor')}${th('categoria','Categoria')}${th('valorRef','Valor ref.')}${th('vigenciaFim','Vigência fim')}<th>Dias</th>${th('situacao','Situação')}<th>Alt.</th>${th('fiscalTitular','Fiscal tit.')}</tr></thead><tbody>`;
-  if(!cs.length)html+=`<tr><td colspan="9"><div class="empty">Nenhum contrato com os filtros atuais.</div></td></tr>`;
-  cs.forEach(c=>{
-    const d=diasAVencer(c.vigenciaFim);
-    const dpill=!ativo(c)?'<span class="pill neu">—</span>':d==null?'<span class="pill neu">—</span>':d<0?`<span class="pill danger">${d}</span>`:d<=90?`<span class="pill warn">${d}</span>`:`<span class="pill ok">${d}</span>`;
-    const sefe=situacaoEfetiva(c);
-    const dirty=(c.tipoValor==='continuo'&&c.valorMensal==null)||(c.tipoValor==='unico'&&c.valorTotal==null);
-    const nalt=(c.aditivos?.length||0)+(c.apostilamentos?.length||0);
-    const rep=c.repactuacao&&['EM TRÂMITE','PENDENTE'].includes((c.repactuacao.status||'').toUpperCase())?'<span class="badge" style="background:#fcf3e0;color:#9a6608" title="repactuação em andamento">REP</span>':'';
-    html+=`<tr class="clickable" onclick="openEdit('${c.id}')">
-      <td><b>${esc(c.contrato||'—')}</b>${dups.has(dupKeyOf(c))?' <span class="badge" style="background:#fcf3e0;color:#9a6608" title="Mesmo nº e fornecedor de outro registro — verifique duplicidade">DUP?</span>':''}<br><span class="tag-cat">${rotuloTipo(c.tipoValor)}</span></td>
-      <td>${esc(c.fornecedor||'—')}<br><span style="color:var(--muted);font-size:11.5px">${esc(c.objeto||'')}</span></td>
-      <td style="font-size:11.5px">${esc(c.categoria)}</td>
-      <td style="white-space:nowrap">${BRL(valorRef(c))}${dirty?'<br><span class="dq">⚠ revisar</span>':''}<br><span style="color:var(--muted);font-size:11px">${c.tipoValor==='continuo'?'/mês':'total'}</span></td>
-      <td style="white-space:nowrap">${fmtDate(c.vigenciaFim)}</td><td>${dpill}</td>
-      <td><span class="pill ${pillSit(sefe)}">${esc(sefe)}</span> ${rep}</td>
-      <td>${nalt?`<span class="badge">${nalt}</span>`:'—'}</td>
-      <td style="font-size:12px">${esc(c.fiscalTitular||'—')}</td></tr>`;
-  });
+  if(!cs.length){
+    html+=`<tr><td colspan="9"><div class="empty">Nenhum contrato com os filtros atuais.</div></td></tr>`;
+  } else {
+    const concl=cs.filter(c=>bucketOf(c)==='concluido');
+    const act=cs.filter(c=>bucketOf(c)!=='concluido');
+    const extras=[...new Set(act.map(c=>c.categoria||''))].filter(x=>!CATEGORIAS.includes(x));
+    [...CATEGORIAS,...extras].forEach(cat=>{
+      const grp=act.filter(c=>(c.categoria||'')===cat);
+      if(!grp.length)return;
+      html+=`<tr class="grp"><td colspan="9"><span class="grp-name">${esc(cat||'(sem categoria)')}</span><span class="grp-meta">${grp.length} contrato(s) · ordenados por vigência</span></td></tr>`;
+      grp.forEach(c=>html+=contractRow(c,dups));
+    });
+    if(concl.length){
+      html+=`<tr class="grp concl"><td colspan="9"><span class="grp-name">Concluídos</span><span class="grp-meta">${concl.length} contrato(s) — encerrados, fora do cômputo dos totais</span></td></tr>`;
+      concl.forEach(c=>html+=contractRow(c,dups));
+    }
+  }
   html+=`</tbody></table></div><div class="sans" style="font-size:12px;color:var(--muted);margin-top:8px">${cs.length} de ${DB.length} contratos.</div>`;
   return html;
+}
+function contractRow(c,dups){
+  const d=diasAVencer(c.vigenciaFim);
+  const dpill=!ativo(c)?'<span class="pill neu">—</span>':d==null?'<span class="pill neu">—</span>':d<0?`<span class="pill danger">${d}</span>`:d<=90?`<span class="pill warn">${d}</span>`:`<span class="pill ok">${d}</span>`;
+  const sefe=situacaoEfetiva(c);
+  const dirty=(c.tipoValor==='continuo'&&c.valorMensal==null)||(c.tipoValor==='unico'&&c.valorTotal==null);
+  const nalt=(c.aditivos?.length||0)+(c.apostilamentos?.length||0);
+  const rep=c.repactuacao&&['EM TRÂMITE','PENDENTE'].includes((c.repactuacao.status||'').toUpperCase())?'<span class="badge" style="background:#fcf3e0;color:#9a6608" title="repactuação em andamento">REP</span>':'';
+  return `<tr class="clickable" onclick="openEdit('${c.id}')">
+    <td><b>${esc(c.contrato||'—')}</b>${dups.has(dupKeyOf(c))?' <span class="badge" style="background:#fcf3e0;color:#9a6608" title="Mesmo nº e fornecedor de outro registro — verifique duplicidade">DUP?</span>':''}<br><span class="tag-cat">${rotuloTipo(c.tipoValor)}</span></td>
+    <td>${esc(c.fornecedor||'—')}<br><span style="color:var(--muted);font-size:11.5px">${esc(c.objeto||'')}</span></td>
+    <td style="font-size:11.5px">${esc(c.categoria)}</td>
+    <td style="white-space:nowrap">${BRL(valorRef(c))}${dirty?'<br><span class="dq">⚠ revisar</span>':''}<br><span style="color:var(--muted);font-size:11px">${c.tipoValor==='continuo'?'/mês':'total'}</span></td>
+    <td style="white-space:nowrap">${fmtDate(c.vigenciaFim)}</td><td>${dpill}</td>
+    <td><span class="pill ${pillSit(sefe)}">${esc(sefe)}</span> ${rep}</td>
+    <td>${nalt?`<span class="badge">${nalt}</span>`:'—'}</td>
+    <td style="font-size:12px">${esc(c.fiscalTitular||'—')}</td></tr>`;
 }
 function th(k,l){const act=state.sortKey===k;return`<th onclick="sortBy('${k}')">${l}${act?(state.sortDir>0?' ▲':' ▼'):''}</th>`;}
 function sortBy(k){if(state.sortKey===k)state.sortDir*=-1;else{state.sortKey=k;state.sortDir=1;}renderBody();}

@@ -237,23 +237,14 @@ function renderDash(){
   html+=`</div></div>`;
   const reneg=cs.filter(c=>situacaoEfetiva(c)==='RENEGOCIAR').length;
   if(reneg)html+=`<div class="alert i" style="cursor:pointer" onclick="goFiltered({sit:'RENEGOCIAR'})">↻ <div><b>${reneg} contrato(s) em renegociação.</b> Clique para abrir.</div></div>`;
-  // categorias (só contínuos fixos) + situação
-  const contCats=['TERCEIRIZADAS','SERVIÇOS ESSENCIAIS','LOCAÇÃO IMÓVEIS','SERVIÇOS GERAIS'];
-  const porCat=contCats.map(cat=>{const list=cont.filter(c=>c.categoria===cat);const co=list.reduce((s,c)=>s+(c.valorMensal||0),0);return{cat,qtd:list.length,co};}).filter(x=>x.qtd>0);
-  const maxRec=Math.max(1,...porCat.map(x=>x.co));
+  // despesa AGRUPADA por categoria; tipo de pagamento é característica de mensuração (não dimensão de filtro)
+  const allCats=[...CATEGORIAS,...[...new Set(ativos.map(c=>c.categoria||''))].filter(x=>!CATEGORIAS.includes(x))];
+  const porCat=allCats.map(cat=>{const list=ativos.filter(c=>(c.categoria||'')===cat);if(!list.length)return null;const mensal=list.filter(c=>c.tipoValor==='continuo').reduce((s,c)=>s+(c.valorMensal||0),0);const demanda=list.filter(c=>c.tipoValor==='demanda').reduce((s,c)=>s+valorRef(c),0);const unico=list.filter(c=>c.tipoValor==='unico').reduce((s,c)=>s+(c.valorTotal||0),0);return{cat,qtd:list.length,mensal,demanda,unico};}).filter(Boolean);
   const sitMap={};cs.forEach(c=>{const s=situacaoEfetiva(c);sitMap[s]=(sitMap[s]||0)+1;});
-  html+=`<div class="grid2"><div class="panel"><h2>Despesa mensal fixa por categoria</h2><div class="desc">Apenas contínuos de pagamento mensal e ativos. Por demanda e únicos exibidos à parte.</div>`;
-  porCat.forEach(x=>{html+=`<div class="bar-row clk" onclick="goFiltered({cat:'${x.cat.replace(/'/g,"\\'")}'})"><div class="nm">${esc(x.cat)} <span style="color:var(--muted)">(${x.qtd})</span></div><div class="bar-track"><div class="bar-fill" style="width:${(x.co/maxRec*100).toFixed(1)}%"></div></div><div class="vl">${x.co?BRL(x.co):'—'}</div></div>`;});
+  html+=`<div class="grid2"><div class="panel"><h2>Despesa por categoria (ativos)</h2><div class="desc">Agrupamento por categoria. O valor é separado por tipo de pagamento — mensal fixa, por demanda e pagamento único —, característica de mensuração que não se soma num único número. Clique numa categoria para abrir todos os seus contratos.</div>`;
+  porCat.forEach(x=>{const parts=[];if(x.mensal)parts.push(`mensal fixa <b style="color:var(--ink)">${BRL(x.mensal)}</b>`);if(x.demanda)parts.push(`por demanda <b style="color:var(--ink)">${BRL(x.demanda)}</b>`);if(x.unico)parts.push(`pagamento único <b style="color:var(--ink)">${BRL(x.unico)}</b>`);html+=`<div class="row-click" style="display:block" onclick="goFiltered({cat:'${x.cat.replace(/'/g,"\\'")}'})"><div style="display:flex;justify-content:space-between;align-items:baseline"><span><b>${esc(x.cat||'(sem categoria)')}</b> <span style="color:var(--muted);font-size:12px">(${x.qtd})</span></span></div><div class="sans" style="font-size:11.5px;color:var(--muted);margin-top:2px">${parts.length?parts.join(' · '):'—'}</div></div>`;});
   html+=`</div><div class="panel"><h2>Distribuição por situação</h2><div class="desc">Situação efetiva, atualizada automaticamente pela vigência. Clique para filtrar.</div>`;
   Object.entries(sitMap).sort((a,b)=>b[1]-a[1]).forEach(([s,n])=>{html+=`<div class="row-click" onclick="goFiltered({sit:'${s.replace(/'/g,"\\'")}'})"><span class="pill ${pillSit(s)}">${esc(s)}</span><b>${n}</b></div>`;});
-  html+=`</div></div>`;
-  // por demanda + único detalhados
-  html+=`<div class="grid2"><div class="panel"><h2>Contínuos por demanda (ativos)</h2><div class="desc">Manutenção, seguro, licenças: contínuos/renováveis, mas pagos por demanda — valor lido como global, não como mensalidade fixa. Clique para filtrar.</div>`;
-  const demByCat={};dem.forEach(c=>{demByCat[c.categoria]=(demByCat[c.categoria]||0)+valorRef(c);});
-  Object.entries(demByCat).sort((a,b)=>b[1]-a[1]).forEach(([cat,v])=>{html+=`<div class="row-click" onclick="goFiltered({cat:'${cat.replace(/'/g,"\\'")}'})"><span>${esc(cat)}</span><b>${BRL(v)}</b></div>`;});
-  html+=`</div><div class="panel"><h2>Aquisições / Pagamento único (ativos)</h2><div class="desc">Pagamento único; encerram ao fim da vigência (não se renovam). Clique para filtrar.</div>`;
-  const uniByCat={};uni.forEach(c=>{uniByCat[c.categoria]=(uniByCat[c.categoria]||0)+(c.valorTotal||0);});
-  Object.entries(uniByCat).sort((a,b)=>b[1]-a[1]).forEach(([cat,v])=>{html+=`<div class="row-click" onclick="goFiltered({cat:'${cat.replace(/'/g,"\\'")}'})"><span>${esc(cat)}</span><b>${BRL(v)}</b></div>`;});
   html+=`</div></div>`;
   // repactuação mini-panel
   const repMap={};cs.forEach(c=>{if(c.repactuacao){const s=(c.repactuacao.status||'N/I').toUpperCase();repMap[s]=(repMap[s]||0)+1;}});

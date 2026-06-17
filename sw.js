@@ -1,7 +1,7 @@
 /* Service worker — Gestão de Contratos CFCC/DPE-RN
    Cacheia o app shell para uso offline. Os DADOS não passam por aqui:
    ficam em localStorage (local) e na pasta compartilhada (File System Access API). */
-const CACHE = 'cfcc-contratos-gh-v4';
+const CACHE = 'cfcc-contratos-gh-v5';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
